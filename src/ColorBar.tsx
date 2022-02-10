@@ -53,6 +53,7 @@ export function ColorBar({ change, fixed1, fixed2 }: ColorProps) {
         newLeft = rightEdge;
       }
       picker.current.style.left = newLeft + "px";
+
       // if (!canvasRef.current) {
       //   return;
       // }
