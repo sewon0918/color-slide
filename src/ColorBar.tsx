@@ -7,7 +7,6 @@ interface ColorProps {
 }
 
 export function ColorBar({ change, fixed1, fixed2 }: ColorProps) {
-  const colorChange = useRef();
   let fromColor: string = "#";
   let toColor: string = "#";
   if (change == 0) {
@@ -23,49 +22,47 @@ export function ColorBar({ change, fixed1, fixed2 }: ColorProps) {
   console.log(change, fromColor, toColor);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const slider = useRef<HTMLDivElement>(null);
+  const picker = useRef<HTMLDivElement>(null);
 
-  const slider: HTMLElement | null = document.querySelector(
-    "#slider"
-  ) as HTMLElement;
-  const picker: HTMLElement | null = document.querySelector(
-    "#picker"
-  ) as HTMLElement;
-  console.log(document.querySelector("#picker") as HTMLDivElement);
   let shiftX: number = 0;
   let newLeft: number = 0;
   const onMouseDown = (e: MouseEvent) => {
     e.preventDefault();
     console.log("mousedown", change);
-    if (picker) {
-      console.log(picker.getBoundingClientRect().left);
+    if (picker.current) {
+      console.log(picker.current.getBoundingClientRect().left);
       console.log(e.clientX);
-      shiftX = e.clientX - picker.getBoundingClientRect().left;
+      shiftX = e.clientX - picker.current.getBoundingClientRect().left;
       console.log(shiftX);
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
     }
   };
   function onMouseMove(e: MouseEvent) {
-    newLeft = e.clientX - shiftX - slider!.getBoundingClientRect().left;
-    console.log(newLeft);
-    // the pointer is out of slider => lock the thumb within the bounaries
-    if (newLeft < 0) {
-      newLeft = 0;
+    if (slider.current && picker.current) {
+      newLeft =
+        e.clientX - shiftX - slider.current.getBoundingClientRect().left;
+      console.log(newLeft);
+      // the pointer is out of slider => lock the thumb within the bounaries
+      if (newLeft < 0) {
+        newLeft = 0;
+      }
+      let rightEdge = slider.current.offsetWidth - picker.current.offsetWidth;
+      if (newLeft > rightEdge) {
+        newLeft = rightEdge;
+      }
+      picker.current.style.left = newLeft + "px";
+      // if (!canvasRef.current) {
+      //   return;
+      // }
+      // const canvas: HTMLCanvasElement = canvasRef.current;
+      // const context = canvas.getContext("2d");
+      // if (context) {
+      //   var c = context.getImageData(newLeft, e.clientY, 1, 1).data;
+      //   console.log(c[0], c[1], c[2]);
+      // }
     }
-    let rightEdge = slider!.offsetWidth - picker!.offsetWidth;
-    if (newLeft > rightEdge) {
-      newLeft = rightEdge;
-    }
-    picker!.style.left = newLeft + "px";
-    // if (!canvasRef.current) {
-    //   return;
-    // }
-    // const canvas: HTMLCanvasElement = canvasRef.current;
-    // const context = canvas.getContext("2d");
-    // if (context) {
-    //   var c = context.getImageData(newLeft, e.clientY, 1, 1).data;
-    //   console.log(c[0], c[1], c[2]);
-    // }
   }
 
   function onMouseUp() {
@@ -80,7 +77,7 @@ export function ColorBar({ change, fixed1, fixed2 }: ColorProps) {
         style={{
           background: `linear-gradient(to right, ${fromColor}, ${toColor})`,
         }}
-        id="slider"
+        ref={slider}
       >
         <div
           className="w-10 h-10 x-10 border-4 border-white rounded-full bg-transparent"
@@ -88,7 +85,7 @@ export function ColorBar({ change, fixed1, fixed2 }: ColorProps) {
           onMouseDown={(event: any) => {
             onMouseDown(event);
           }}
-          id="picker"
+          ref={picker}
         />
       </div>
     </div>
