@@ -21,8 +21,8 @@ export function ColorBar({ change, fixed1, fixed2 }: ColorProps) {
   }
   console.log(change, fromColor, toColor);
 
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const slider = useRef<HTMLDivElement>(null);
+  const slider = useRef<HTMLCanvasElement>(null);
+  //   const slider = useRef<HTMLDivElement>(null);
   const picker = useRef<HTMLDivElement>(null);
 
   let shiftX: number = 0;
@@ -31,19 +31,35 @@ export function ColorBar({ change, fixed1, fixed2 }: ColorProps) {
     e.preventDefault();
     console.log("mousedown", change);
     if (picker.current) {
-      console.log(picker.current.getBoundingClientRect().left);
-      console.log(e.clientX);
+      //   console.log(picker.current.getBoundingClientRect().left);
+      //   console.log(e.clientX);
       shiftX = e.clientX - picker.current.getBoundingClientRect().left;
-      console.log(shiftX);
+      //   console.log(shiftX);
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
+      if (slider.current) {
+        const canvas: HTMLCanvasElement = slider.current;
+        const context = canvas.getContext("2d");
+        if (context) {
+          var gradient = context.createLinearGradient(0, 0, 50, 0);
+          gradient.addColorStop(0, "#000000");
+          gradient.addColorStop(1, "#ff0000");
+          context.fillStyle = gradient;
+          console.log(canvas.offsetHeight);
+          context.rect(10, 10, 50, 50);
+          context.fill();
+          console.log(newLeft, e.clientY);
+          var c = context.getImageData(newLeft, 12, 1, 1).data;
+          //   var c = context.getImageData(110, 13, 1, 1).data;
+          console.log(c);
+        }
+      }
     }
   };
   function onMouseMove(e: MouseEvent) {
     if (slider.current && picker.current) {
       newLeft =
         e.clientX - shiftX - slider.current.getBoundingClientRect().left;
-      console.log(newLeft);
       // the pointer is out of slider => lock the thumb within the bounaries
       if (newLeft < 0) {
         newLeft = 0;
@@ -53,16 +69,25 @@ export function ColorBar({ change, fixed1, fixed2 }: ColorProps) {
         newLeft = rightEdge;
       }
       picker.current.style.left = newLeft + "px";
+      if (!slider.current) {
+        return;
+      }
+      const canvas: HTMLCanvasElement = slider.current;
+      const context = canvas.getContext("2d");
 
-      // if (!canvasRef.current) {
-      //   return;
-      // }
-      // const canvas: HTMLCanvasElement = canvasRef.current;
-      // const context = canvas.getContext("2d");
-      // if (context) {
-      //   var c = context.getImageData(newLeft, e.clientY, 1, 1).data;
-      //   console.log(c[0], c[1], c[2]);
-      // }
+      if (context) {
+        // console.log(
+        //   context.getImageData(
+        //     e.clientX - slider.current.getBoundingClientRect().left,
+        //     e.clientY - slider.current.getBoundingClientRect().top,
+        //     1,
+        //     1
+        //   ).data
+        // );
+        // var c = context.getImageData(newLeft, 7, 1, 1).data;
+        // console.log(c);
+        // var c = context.getImageData(e.clientX, e.clientY, 1, 1).data;
+      }
     }
   }
 
@@ -72,23 +97,24 @@ export function ColorBar({ change, fixed1, fixed2 }: ColorProps) {
   }
 
   return (
-    <div>
-      <div
-        className="w-96 h-10 rounded-full mb-4"
-        style={{
-          background: `linear-gradient(to right, ${fromColor}, ${toColor})`,
-        }}
+    <div className="relative">
+      <canvas
+        className="w-96 h-10 rounded-full mb-4 z-0 absolute bg-gradient-to-r from-cyan-500 to-blue-500"
+        style={
+          {
+            //   background: `linear-gradient(to right, ${fromColor}, ${toColor})`,
+          }
+        }
         ref={slider}
-      >
-        <div
-          className="w-10 h-10 x-10 border-4 border-white rounded-full bg-transparent"
-          style={{ position: "relative", left: "0px" }}
-          onMouseDown={(event: any) => {
-            onMouseDown(event);
-          }}
-          ref={picker}
-        />
-      </div>
+      ></canvas>
+      <div
+        className="w-10 h-10 x-10 border-4 border-white rounded-full bg-transparent z-10"
+        style={{ position: "relative", left: "0px" }}
+        onMouseDown={(event: any) => {
+          onMouseDown(event);
+        }}
+        ref={picker}
+      />
     </div>
   );
 }
