@@ -7,6 +7,10 @@ module.exports = {
         "real-green": "#00ee00",
         "real-blue": "#0000ee",
       },
+      spacing: {
+        barX: "400px",
+        picker: "40px",
+      },
     },
   },
   plugins: [],
