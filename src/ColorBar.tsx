@@ -1,4 +1,5 @@
-import React, { useRef, useState, useCallback, useEffect } from "react";
+import React, { useRef, useState, useContext } from "react";
+import { useColorState, useColorDispatch } from "./context";
 
 interface ColorProps {
   change: number; // 0:red, 1:green, 2:blue
@@ -7,6 +8,16 @@ interface ColorProps {
 }
 
 export function ColorBar({ change, fixed1, fixed2 }: ColorProps) {
+  const [value, setValue] = useState<number>(0);
+  const colorState = useColorState();
+  const colorDispatch = useColorDispatch();
+
+  const setRed = (red: number) => colorDispatch({ type: "SET_RED", red: red });
+  const setGreen = (green: number) =>
+    colorDispatch({ type: "SET_GREEN", green: green });
+  const setBlue = (blue: number) =>
+    colorDispatch({ type: "SET_BLUE", blue: blue });
+
   const color = ["red", "green", "blue"];
   let fromColor: string = "#";
   let toColor: string = "#";
@@ -20,7 +31,7 @@ export function ColorBar({ change, fixed1, fixed2 }: ColorProps) {
     fromColor += fixed1 + fixed2 + "00";
     toColor += fixed1 + fixed2 + "ff";
   }
-  console.log(change, fromColor, toColor);
+  //   console.log(change, fromColor, toColor);
 
   const slider = useRef<HTMLCanvasElement>(null);
   //   const slider = useRef<HTMLDivElement>(null);
@@ -82,22 +93,34 @@ export function ColorBar({ change, fixed1, fixed2 }: ColorProps) {
           1,
           1
         ).data;
-        var rgba =
-          "rgba(" +
-          data[0] +
-          ", " +
-          data[1] +
-          ", " +
-          data[2] +
-          ", " +
-          data[3] / 255 +
-          ")";
-        console.log(newLeft, rgba);
+
+        console.log(data[0], data[1], data[2]);
+        if (change == 0) {
+          console.log("red", data[0]);
+          setValue(data[0]);
+        } else if (change == 1) {
+          console.log("green", data[1]);
+          setValue(data[1]);
+        } else {
+          console.log("blue", data[2]);
+          setValue(data[2]);
+        }
+
+        console.log(value);
       }
     }
   }
 
   function onMouseUp() {
+    if (change == 0) {
+      console.log(value);
+      setRed(value);
+    } else if (change == 1) {
+      setGreen(value);
+    } else {
+      setBlue(value);
+    }
+    console.log(colorState.red, colorState.green, colorState.blue);
     document.removeEventListener("mouseup", onMouseUp);
     document.removeEventListener("mousemove", onMouseMove);
   }
