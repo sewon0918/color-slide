@@ -1,4 +1,4 @@
-import React, { useRef, useState, useContext } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useColorState, useColorDispatch } from "./context";
 
 interface ColorProps {
@@ -9,16 +9,15 @@ interface ColorProps {
 
 export function ColorBar({ change, fixed1, fixed2 }: ColorProps) {
   const [value, setValue] = useState<number>(0);
+  const [valueChange, setValueChange] = useState<boolean>(false);
   const colorState = useColorState();
   const colorDispatch = useColorDispatch();
-
   const setRed = (red: number) => colorDispatch({ type: "SET_RED", red: red });
   const setGreen = (green: number) =>
     colorDispatch({ type: "SET_GREEN", green: green });
   const setBlue = (blue: number) =>
     colorDispatch({ type: "SET_BLUE", blue: blue });
 
-  const color = ["red", "green", "blue"];
   let fromColor: string = "#";
   let toColor: string = "#";
   if (change == 0) {
@@ -42,6 +41,7 @@ export function ColorBar({ change, fixed1, fixed2 }: ColorProps) {
   const onMouseDown = (e: MouseEvent) => {
     e.preventDefault();
     console.log("mousedown", change);
+    setValueChange(true);
     if (picker.current) {
       //   console.log(picker.current.getBoundingClientRect().left);
       //   console.log(e.clientX);
@@ -94,36 +94,40 @@ export function ColorBar({ change, fixed1, fixed2 }: ColorProps) {
           1
         ).data;
 
-        console.log(data[0], data[1], data[2]);
+        console.log("color: ", data[0], data[1], data[2]);
         if (change == 0) {
-          console.log("red", data[0]);
           setValue(data[0]);
         } else if (change == 1) {
-          console.log("green", data[1]);
           setValue(data[1]);
         } else {
-          console.log("blue", data[2]);
           setValue(data[2]);
         }
-
-        console.log(value);
       }
     }
   }
-
   function onMouseUp() {
+    setValueChange(false);
+    document.removeEventListener("mouseup", onMouseUp);
+    document.removeEventListener("mousemove", onMouseMove);
+  }
+
+  useEffect(() => {
+    console.log("value: ", value);
+  }, [value]);
+
+  useEffect(() => {
     if (change == 0) {
-      console.log(value);
       setRed(value);
     } else if (change == 1) {
       setGreen(value);
     } else {
       setBlue(value);
     }
-    console.log(colorState.red, colorState.green, colorState.blue);
-    document.removeEventListener("mouseup", onMouseUp);
-    document.removeEventListener("mousemove", onMouseMove);
-  }
+  }, [valueChange]);
+
+  useEffect(() => {
+    console.log("colorstate: ", colorState);
+  }, [colorState]);
 
   return (
     <div className="relative">

@@ -2,6 +2,7 @@ import { Console } from "console";
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import { SketchPicker, BlockPicker, PhotoshopPicker } from "react-color";
 import { ColorBar } from "./ColorBar";
+import { ColorProvider } from "./context";
 
 interface CanvasProps {
   width: number;
@@ -122,21 +123,26 @@ function App({ width, height }: CanvasProps) {
   }, [startPaint, paint, exitPaint]);
 
   return (
-    <div className="container mx-auto my-10">
-      <canvas
-        ref={canvasRef}
-        height={height}
-        width={width}
-        className="rounded-lg bg-gray-200"
-      />
-      <button className="rounded-lg p-3 mt-3 bg-gray-100" onClick={clearCanvas}>
-        delete
-      </button>
-      {/* <BlockPicker color="#333" /> */}
-      <ColorBar change={0} fixed1={"00"} fixed2={"00"} />
-      <ColorBar change={1} fixed1={"00"} fixed2={"00"} />
-      <ColorBar change={2} fixed1={"00"} fixed2={"00"} />
-    </div>
+    <ColorProvider>
+      <div className="container mx-auto my-10">
+        <canvas
+          ref={canvasRef}
+          height={height}
+          width={width}
+          className="rounded-lg bg-gray-200"
+        />
+        <button
+          className="rounded-lg p-3 mt-3 bg-gray-100"
+          onClick={clearCanvas}
+        >
+          delete
+        </button>
+        {/* <BlockPicker color="#333" /> */}
+        <ColorBar change={0} fixed1={"00"} fixed2={"00"} />
+        <ColorBar change={1} fixed1={"00"} fixed2={"00"} />
+        <ColorBar change={2} fixed1={"00"} fixed2={"00"} />
+      </div>
+    </ColorProvider>
   );
 }
 
