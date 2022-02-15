@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { useColorState, useColorDispatch } from "./context";
+import { useColorState, useColorDispatch } from "../context";
 
 interface ColorProps {
   id: number; // 0:red, 1:green, 2:blue
