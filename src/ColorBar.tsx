@@ -19,21 +19,13 @@ export function ColorBar({ id }: ColorProps) {
   const setChanging = (changing: boolean) =>
     colorDispatch({ type: "SET_CHANGING", changing: changing });
 
-  let fixed1: string = "";
-  let fixed2: string = "";
+  let fixed1: string = "00";
+  let fixed2: string = "00";
   let fromColor: string = "#";
   let toColor: string = "#";
 
-  if (id == 0) {
-    fixed1 = colorState.green.toString(16).padStart(2, "0");
-    fixed2 = colorState.blue.toString(16).padStart(2, "0");
-  } else if (id == 1) {
-    fixed1 = colorState.red.toString(16).padStart(2, "0");
-    fixed2 = colorState.blue.toString(16).padStart(2, "0");
-  } else {
-    fixed1 = colorState.red.toString(16).padStart(2, "0");
-    fixed2 = colorState.green.toString(16).padStart(2, "0");
-  }
+  const slider = useRef<HTMLCanvasElement>(null);
+  const picker = useRef<HTMLDivElement>(null);
 
   if (id == 0) {
     fromColor += "00" + fixed1 + fixed2;
@@ -45,23 +37,15 @@ export function ColorBar({ id }: ColorProps) {
     fromColor += fixed1 + fixed2 + "00";
     toColor += fixed1 + fixed2 + "ff";
   }
-  console.log(fromColor, toColor);
-
-  const slider = useRef<HTMLCanvasElement>(null);
-  const picker = useRef<HTMLDivElement>(null);
 
   let shiftX: number = 0;
   let newLeft: number = 0;
   const onMouseDown = (e: MouseEvent) => {
     e.preventDefault();
     setColor(id);
-    console.log("mousedown", id);
     setChanging(true);
     if (picker.current) {
-      //   console.log(picker.current.getBoundingClientRect().left);
-      //   console.log(e.clientX);
       shiftX = e.clientX - picker.current.getBoundingClientRect().left;
-      //   console.log(shiftX);
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
       if (slider.current) {
@@ -78,7 +62,6 @@ export function ColorBar({ id }: ColorProps) {
           gra.addColorStop(1, toColor);
           context.fillStyle = gra;
           context.fillRect(0, 0, canvas.width, canvas.height);
-          //   console.log(picker.current.getBoundingClientRect().width);
         }
       }
     }
@@ -109,7 +92,6 @@ export function ColorBar({ id }: ColorProps) {
           1
         ).data;
 
-        // console.log("color: ", data[0], data[1], data[2]);
         if (id == 0) {
           setValue(data[0]);
         } else if (id == 1) {
@@ -137,23 +119,49 @@ export function ColorBar({ id }: ColorProps) {
     }
   }, [value]);
 
-  //   useEffect(() => {
-  //     if (change == 0) {
-  //       setRed(value);
-  //     } else if (change == 1) {
-  //       setGreen(value);
-  //     } else {
-  //       setBlue(value);
-  //     }
-  //   }, [valueChange]);
-
   useEffect(() => {
     console.log("colorstate: ", colorState);
-    console.log(
-      colorState.red.toString(16).padStart(2, "0"),
-      colorState.green.toString(16).padStart(2, "0"),
-      colorState.blue.toString(16).padStart(2, "0")
-    );
+    fixed1 = "00";
+    fixed2 = "00";
+    fromColor = "#";
+    toColor = "#";
+    if (id == 0) {
+      fixed1 = colorState.green.toString(16).padStart(2, "0");
+      fixed2 = colorState.blue.toString(16).padStart(2, "0");
+    } else if (id == 1) {
+      fixed1 = colorState.red.toString(16).padStart(2, "0");
+      fixed2 = colorState.blue.toString(16).padStart(2, "0");
+    } else {
+      fixed1 = colorState.red.toString(16).padStart(2, "0");
+      fixed2 = colorState.green.toString(16).padStart(2, "0");
+    }
+
+    if (id == 0) {
+      fromColor += "00" + fixed1 + fixed2;
+      toColor += "ff" + fixed1 + fixed2;
+    } else if (id == 1) {
+      fromColor += fixed1 + "00" + fixed2;
+      toColor += fixed1 + "ff" + fixed2;
+    } else {
+      fromColor += fixed1 + fixed2 + "00";
+      toColor += fixed1 + fixed2 + "ff";
+    }
+    if (picker.current && slider.current) {
+      const canvas: HTMLCanvasElement = slider.current;
+      const context = canvas.getContext("2d");
+      if (context) {
+        var gra = context.createLinearGradient(
+          picker.current.offsetWidth / 2,
+          0,
+          canvas.width - picker.current.offsetWidth / 2,
+          0
+        );
+        gra.addColorStop(0, fromColor);
+        gra.addColorStop(1, toColor);
+        context.fillStyle = gra;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+      }
+    }
   }, [colorState]);
 
   return (
