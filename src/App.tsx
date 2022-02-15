@@ -2,7 +2,7 @@ import { Console } from "console";
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import { SketchPicker, BlockPicker, PhotoshopPicker } from "react-color";
 import { ColorBar } from "./ColorBar";
-import { ColorProvider } from "./context";
+import { ColorProvider, useColorState } from "./context";
 
 interface CanvasProps {
   width: number;
@@ -15,6 +15,8 @@ interface Coordinate {
 }
 
 function App({ width, height }: CanvasProps) {
+  const colorState = useColorState();
+  console.log("APP", colorState);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [mousePosition, setMousePosition] = useState<Coordinate | undefined>(
@@ -138,9 +140,27 @@ function App({ width, height }: CanvasProps) {
           delete
         </button>
         {/* <BlockPicker color="#333" /> */}
-        <ColorBar change={0} fixed1={"00"} fixed2={"00"} />
+        {/* <ColorBar change={0} fixed1={"00"} fixed2={"00"} />
         <ColorBar change={1} fixed1={"00"} fixed2={"00"} />
-        <ColorBar change={2} fixed1={"00"} fixed2={"00"} />
+        <ColorBar change={2} fixed1={"00"} fixed2={"00"} /> */}
+        <ColorBar id={0} />
+        <ColorBar id={1} />
+        <ColorBar id={2} />
+        {/* <ColorBar
+          change={0}
+          fixed1={colorState.green.toString(16).padStart(2, "0")}
+          fixed2={colorState.blue.toString(16).padStart(2, "0")}
+        />
+        <ColorBar
+          change={1}
+          fixed1={colorState.red.toString(16).padStart(2, "0")}
+          fixed2={colorState.blue.toString(16).padStart(2, "0")}
+        />
+        <ColorBar
+          change={2}
+          fixed1={colorState.red.toString(16).padStart(2, "0")}
+          fixed2={colorState.green.toString(16).padStart(2, "0")}
+        /> */}
       </div>
     </ColorProvider>
   );

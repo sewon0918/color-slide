@@ -2,14 +2,11 @@ import React, { useRef, useState, useEffect } from "react";
 import { useColorState, useColorDispatch } from "./context";
 
 interface ColorProps {
-  change: number; // 0:red, 1:green, 2:blue
-  fixed1: string;
-  fixed2: string;
+  id: number; // 0:red, 1:green, 2:blue
 }
 
-export function ColorBar({ change, fixed1, fixed2 }: ColorProps) {
+export function ColorBar({ id }: ColorProps) {
   const [value, setValue] = useState<number>(0);
-  const [valueChange, setValueChange] = useState<boolean>(false);
   const colorState = useColorState();
   const colorDispatch = useColorDispatch();
   const setRed = (red: number) => colorDispatch({ type: "SET_RED", red: red });
@@ -17,31 +14,49 @@ export function ColorBar({ change, fixed1, fixed2 }: ColorProps) {
     colorDispatch({ type: "SET_GREEN", green: green });
   const setBlue = (blue: number) =>
     colorDispatch({ type: "SET_BLUE", blue: blue });
+  const setColor = (color: number) =>
+    colorDispatch({ type: "SET_COLOR", color: color });
+  const setChanging = (changing: boolean) =>
+    colorDispatch({ type: "SET_CHANGING", changing: changing });
 
+  let fixed1: string = "";
+  let fixed2: string = "";
   let fromColor: string = "#";
   let toColor: string = "#";
-  if (change == 0) {
+
+  if (id == 0) {
+    fixed1 = colorState.green.toString(16).padStart(2, "0");
+    fixed2 = colorState.blue.toString(16).padStart(2, "0");
+  } else if (id == 1) {
+    fixed1 = colorState.red.toString(16).padStart(2, "0");
+    fixed2 = colorState.blue.toString(16).padStart(2, "0");
+  } else {
+    fixed1 = colorState.red.toString(16).padStart(2, "0");
+    fixed2 = colorState.green.toString(16).padStart(2, "0");
+  }
+
+  if (id == 0) {
     fromColor += "00" + fixed1 + fixed2;
     toColor += "ff" + fixed1 + fixed2;
-  } else if (change == 1) {
+  } else if (id == 1) {
     fromColor += fixed1 + "00" + fixed2;
     toColor += fixed1 + "ff" + fixed2;
   } else {
     fromColor += fixed1 + fixed2 + "00";
     toColor += fixed1 + fixed2 + "ff";
   }
-  //   console.log(change, fromColor, toColor);
+  console.log(fromColor, toColor);
 
   const slider = useRef<HTMLCanvasElement>(null);
-  //   const slider = useRef<HTMLDivElement>(null);
   const picker = useRef<HTMLDivElement>(null);
 
   let shiftX: number = 0;
   let newLeft: number = 0;
   const onMouseDown = (e: MouseEvent) => {
     e.preventDefault();
-    console.log("mousedown", change);
-    setValueChange(true);
+    setColor(id);
+    console.log("mousedown", id);
+    setChanging(true);
     if (picker.current) {
       //   console.log(picker.current.getBoundingClientRect().left);
       //   console.log(e.clientX);
@@ -94,10 +109,10 @@ export function ColorBar({ change, fixed1, fixed2 }: ColorProps) {
           1
         ).data;
 
-        console.log("color: ", data[0], data[1], data[2]);
-        if (change == 0) {
+        // console.log("color: ", data[0], data[1], data[2]);
+        if (id == 0) {
           setValue(data[0]);
-        } else if (change == 1) {
+        } else if (id == 1) {
           setValue(data[1]);
         } else {
           setValue(data[2]);
@@ -106,27 +121,39 @@ export function ColorBar({ change, fixed1, fixed2 }: ColorProps) {
     }
   }
   function onMouseUp() {
-    setValueChange(false);
+    setChanging(false);
     document.removeEventListener("mouseup", onMouseUp);
     document.removeEventListener("mousemove", onMouseMove);
   }
 
   useEffect(() => {
     console.log("value: ", value);
-  }, [value]);
-
-  useEffect(() => {
-    if (change == 0) {
+    if (id == 0) {
       setRed(value);
-    } else if (change == 1) {
+    } else if (id == 1) {
       setGreen(value);
     } else {
       setBlue(value);
     }
-  }, [valueChange]);
+  }, [value]);
+
+  //   useEffect(() => {
+  //     if (change == 0) {
+  //       setRed(value);
+  //     } else if (change == 1) {
+  //       setGreen(value);
+  //     } else {
+  //       setBlue(value);
+  //     }
+  //   }, [valueChange]);
 
   useEffect(() => {
     console.log("colorstate: ", colorState);
+    console.log(
+      colorState.red.toString(16).padStart(2, "0"),
+      colorState.green.toString(16).padStart(2, "0"),
+      colorState.blue.toString(16).padStart(2, "0")
+    );
   }, [colorState]);
 
   return (
@@ -152,8 +179,8 @@ export function ColorBar({ change, fixed1, fixed2 }: ColorProps) {
   );
 }
 
-ColorBar.defaultProps = {
-  change: 0,
-  fixed1: "00",
-  fixed2: "00",
-};
+// ColorBar.defaultProps = {
+//   change: 0,
+//   fixed1: "00",
+//   fixed2: "00",
+// };
