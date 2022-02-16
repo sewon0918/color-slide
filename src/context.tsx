@@ -18,9 +18,9 @@ type Action =
   | { type: "SET_CHANGING"; changing: boolean };
 
 const initialState = {
-  red: 0,
-  green: 0,
-  blue: 0,
+  red: 127,
+  green: 127,
+  blue: 127,
   color: 0,
   changing: false,
 };

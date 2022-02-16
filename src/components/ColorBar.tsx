@@ -6,7 +6,7 @@ interface ColorProps {
 }
 
 export function ColorBar({ id }: ColorProps) {
-  const [value, setValue] = useState<number>(0);
+  const [value, setValue] = useState<number>(127);
   const colorState = useColorState();
   const colorDispatch = useColorDispatch();
   const setRed = (red: number) => colorDispatch({ type: "SET_RED", red: red });
@@ -19,8 +19,9 @@ export function ColorBar({ id }: ColorProps) {
   const setChanging = (changing: boolean) =>
     colorDispatch({ type: "SET_CHANGING", changing: changing });
 
-  let fixed1: string = "00";
-  let fixed2: string = "00";
+  const color = ["Red", "Green", "Blue"];
+  let fixed1: string = "7f";
+  let fixed2: string = "7f";
   let fromColor: string = "#";
   let toColor: string = "#";
 
@@ -37,7 +38,7 @@ export function ColorBar({ id }: ColorProps) {
     fromColor += fixed1 + fixed2 + "00";
     toColor += fixed1 + fixed2 + "ff";
   }
-
+  console.log(fromColor, toColor);
   let shiftX: number = 0;
   let newLeft: number = 0;
   const onMouseDown = (e: MouseEvent) => {
@@ -176,19 +177,23 @@ export function ColorBar({ id }: ColorProps) {
         ref={slider}
       ></canvas>
       <div
-        className="w-picker h-picker x-10 border-2 border-white mt-4 rounded-full bg-transparent z-10"
-        style={{ position: "relative", left: "0px" }}
+        className="w-picker h-picker x-10 border-2 border-white mt-4 rounded-full  z-10"
+        style={{
+          position: "relative",
+          left: "180px",
+          background: `${
+            "#" +
+            colorState.red.toString(16).padStart(2, "0") +
+            colorState.green.toString(16).padStart(2, "0") +
+            colorState.blue.toString(16).padStart(2, "0")
+          }`,
+        }}
         onMouseDown={(event: any) => {
           onMouseDown(event);
         }}
         ref={picker}
       />
+      <div className="text-sm text-gray-400 font-bold mt-2 ">{color[id]}</div>
     </div>
   );
 }
-
-// ColorBar.defaultProps = {
-//   change: 0,
-//   fixed1: "00",
-//   fixed2: "00",
-// };
