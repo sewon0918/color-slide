@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/color-slide/static/css/main.196f4046.css",
+    "main.js": "/color-slide/static/js/main.ccd1d9cc.js",
+    "static/js/787.f3ddb851.chunk.js": "/color-slide/static/js/787.f3ddb851.chunk.js",
+    "index.html": "/color-slide/index.html",
+    "main.196f4046.css.map": "/color-slide/static/css/main.196f4046.css.map",
+    "main.ccd1d9cc.js.map": "/color-slide/static/js/main.ccd1d9cc.js.map",
+    "787.f3ddb851.chunk.js.map": "/color-slide/static/js/787.f3ddb851.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.196f4046.css",
+    "static/js/main.ccd1d9cc.js"
+  ]
+}

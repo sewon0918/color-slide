@@ -10,6 +10,8 @@ module.exports = {
       spacing: {
         barX: "400px",
         picker: "40px",
+        barX_mobile: "300px",
+        picker_mobile: "30px",
       },
     },
   },

@@ -3,10 +3,11 @@ import { Canvas } from "./components/Canvas";
 import { ColorProvider, useColorState } from "./context";
 
 function App() {
+  console.log(window.innerWidth * (2 / 3));
   return (
     <ColorProvider>
-      <div className="container mx-auto my-10">
-        <Canvas width={800} height={600} />
+      <div className="container ">
+        <Canvas />
         <ColorBar id={0} />
         <ColorBar id={1} />
         <ColorBar id={2} />
