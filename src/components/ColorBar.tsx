@@ -1,6 +1,11 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useColorState, useColorDispatch } from "../context";
-
+import {
+  BrowserView,
+  MobileView,
+  isBrowser,
+  isMobile,
+} from "react-device-detect";
 interface ColorProps {
   id: number; // 0:red, 1:green, 2:blue
 }
@@ -181,7 +186,7 @@ export function ColorBar({ id }: ColorProps) {
         className="w-picker h-picker x-10 border-2 border-white mb-4 rounded-full  z-10"
         style={{
           position: "relative",
-          left: "180px",
+          ...(isBrowser ? { left: "180px" } : { left: "155px" }),
           background: `${
             "#" +
             colorState.red.toString(16).padStart(2, "0") +
