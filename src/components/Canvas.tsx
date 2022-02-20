@@ -32,14 +32,14 @@ export function Canvas() {
 
     if (context) {
       canvas.style.width = `${windowSize.width}px`;
-      canvas.style.height = `${windowSize.height}px`;
+      canvas.style.height = `${windowSize.height * 0.8}px`;
     }
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, [windowSize]);
 
-  console.log(windowSize);
+  //   console.log(windowSize);
 
   const colorState = useColorState();
   const color: string =
@@ -217,16 +217,21 @@ export function Canvas() {
     canvas.dispatchEvent(mouseEvent);
   }, []);
   return (
-    <div className="container ">
+    <div className=" ">
+      <div className="flex justify-end">
+        <button
+          className="rounded-lg p-3 mt-3 bg-gray-100"
+          onClick={clearCanvas}
+        >
+          delete
+        </button>
+      </div>
       <canvas
         ref={canvasRef}
-        height={windowSize.height}
+        height={windowSize.height * 0.8}
         width={windowSize.width}
-        className="rounded-lg bg-gray-200"
+        className="rounded-lg bg-gray-200 mt-3"
       />
-      <button className="rounded-lg p-3 mt-3 bg-gray-100" onClick={clearCanvas}>
-        delete
-      </button>
     </div>
   );
 }

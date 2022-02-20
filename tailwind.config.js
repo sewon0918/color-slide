@@ -8,6 +8,7 @@ module.exports = {
         "real-blue": "#0000ee",
       },
       spacing: {
+        container: "430px",
         barX: "400px",
         picker: "40px",
         barX_mobile: "300px",

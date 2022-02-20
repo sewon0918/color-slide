@@ -38,7 +38,7 @@ export function ColorBar({ id }: ColorProps) {
     fromColor += fixed1 + fixed2 + "00";
     toColor += fixed1 + fixed2 + "ff";
   }
-  console.log(fromColor, toColor);
+  // console.log(fromColor, toColor);
   let shiftX: number = 0;
   let newLeft: number = 0;
   const onMouseDown = (e: MouseEvent) => {
@@ -110,7 +110,7 @@ export function ColorBar({ id }: ColorProps) {
   }
 
   useEffect(() => {
-    console.log("value: ", value);
+    // console.log("value: ", value);
     if (id == 0) {
       setRed(value);
     } else if (id == 1) {
@@ -121,7 +121,7 @@ export function ColorBar({ id }: ColorProps) {
   }, [value]);
 
   useEffect(() => {
-    console.log("colorstate: ", colorState);
+    // console.log("colorstate: ", colorState);
     fixed1 = "00";
     fixed2 = "00";
     fromColor = "#";
@@ -166,7 +166,8 @@ export function ColorBar({ id }: ColorProps) {
   }, [colorState]);
 
   return (
-    <div className="relative">
+    <div className="w-fit">
+      <div className="text-sm text-gray-400 font-bold mb-1">{color[id]}</div>
       <canvas
         className="w-barX  rounded-full z-0 absolute"
         height="40"
@@ -177,7 +178,7 @@ export function ColorBar({ id }: ColorProps) {
         ref={slider}
       ></canvas>
       <div
-        className="w-picker h-picker x-10 border-2 border-white mt-4 rounded-full  z-10"
+        className="w-picker h-picker x-10 border-2 border-white mb-4 rounded-full  z-10"
         style={{
           position: "relative",
           left: "180px",
@@ -193,7 +194,6 @@ export function ColorBar({ id }: ColorProps) {
         }}
         ref={picker}
       />
-      <div className="text-sm text-gray-400 font-bold mt-2 ">{color[id]}</div>
     </div>
   );
 }
