@@ -218,13 +218,30 @@ export function Canvas() {
   }, []);
   return (
     <div className=" ">
-      <div className="flex justify-end">
-        <button
-          className="rounded-lg p-3 mt-3 bg-gray-100"
-          onClick={clearCanvas}
-        >
-          delete
+      <div className="mt-3 flex justify-between">
+        <button className="w-10 h-10 rounded-full font-bold text-4xl ml-3">
+          🎨
         </button>
+        <div>
+          <button
+            className="w-10 h-10 rounded-full  bg-gray-100 font-bold mr-3"
+            onClick={clearCanvas}
+          >
+            ◀️
+          </button>
+          <button
+            className="w-10 h-10 rounded-full bg-gray-100 font-bold mr-3"
+            onClick={clearCanvas}
+          >
+            ▶️
+          </button>
+          <button
+            className="w-10 h-10 rounded-full bg-gray-100 font-bold mr-3"
+            onClick={clearCanvas}
+          >
+            💥
+          </button>
+        </div>
       </div>
       <canvas
         ref={canvasRef}
