@@ -58,7 +58,7 @@ export function SelectColor() {
       </BrowserView>
       <MobileView>
         {isOpen ? (
-          <div className="fixed left-0 bottom-0  rounded-lg w-container bg-slate-100  ">
+          <div className="fixed left-0 bottom-0  rounded-lg w-container_mobile bg-slate-100  ">
             <div className="flex justify-end">
               <button
                 className=" w-8 h-8 mt-2 mr-2 rounded-full bg-gray-200 font-semibold text-gray-400 text-center text-xl"

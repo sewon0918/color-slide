@@ -173,15 +173,28 @@ export function ColorBar({ id }: ColorProps) {
   return (
     <div className="w-fit">
       <div className="text-sm text-gray-400 font-bold mb-1">{color[id]}</div>
-      <canvas
-        className="w-barX  rounded-full z-0 absolute"
-        height="40"
-        width="400"
-        style={{
-          background: `linear-gradient(to right, ${fromColor}, ${toColor})`,
-        }}
-        ref={slider}
-      ></canvas>
+      <BrowserView>
+        <canvas
+          className={`rounded-full z-0 absolute ${isMobile}?w-barX_mobile: w-barX`}
+          height="40"
+          width="400"
+          style={{
+            background: `linear-gradient(to right, ${fromColor}, ${toColor})`,
+          }}
+          ref={slider}
+        ></canvas>
+      </BrowserView>
+      <MobileView>
+        <canvas
+          className={`rounded-full z-0 absolute ${isMobile}?w-barX_mobile: w-barX`}
+          height="40"
+          width="350"
+          style={{
+            background: `linear-gradient(to right, ${fromColor}, ${toColor})`,
+          }}
+          ref={slider}
+        ></canvas>
+      </MobileView>
       <div
         className="w-picker h-picker x-10 border-2 border-white mb-4 rounded-full  z-10"
         style={{
