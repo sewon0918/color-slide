@@ -10,11 +10,6 @@ function App() {
       <div className=" ">
         <Canvas />
         <SelectColor />
-        {/* <div className="p-3 border-2 rounded-lg w-container">
-          <ColorBar id={0} />
-          <ColorBar id={1} />
-          <ColorBar id={2} />
-        </div> */}
       </div>
     </ColorProvider>
   );

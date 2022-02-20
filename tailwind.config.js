@@ -11,8 +11,9 @@ module.exports = {
         container: "430px",
         container_mobile: "375px",
         barX: "400px",
-        picker: "40px",
         barX_mobile: "350px",
+        picker: "40px",
+
         // picker_mobile: "30px",
       },
     },

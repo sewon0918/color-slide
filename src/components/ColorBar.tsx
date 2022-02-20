@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import { useColorState, useColorDispatch } from "../context";
 import {
   BrowserView,
@@ -46,6 +46,7 @@ export function ColorBar({ id }: ColorProps) {
   // console.log(fromColor, toColor);
   let shiftX: number = 0;
   let newLeft: number = 0;
+
   const onMouseDown = (e: MouseEvent) => {
     e.preventDefault();
     setColor(id);
@@ -54,22 +55,6 @@ export function ColorBar({ id }: ColorProps) {
       shiftX = e.clientX - picker.current.getBoundingClientRect().left;
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
-      if (slider.current) {
-        const canvas: HTMLCanvasElement = slider.current;
-        const context = canvas.getContext("2d");
-        if (context) {
-          var gra = context.createLinearGradient(
-            picker.current.offsetWidth / 2,
-            0,
-            canvas.width - picker.current.offsetWidth / 2,
-            0
-          );
-          gra.addColorStop(0, fromColor);
-          gra.addColorStop(1, toColor);
-          context.fillStyle = gra;
-          context.fillRect(0, 0, canvas.width, canvas.height);
-        }
-      }
     }
   };
   function onMouseMove(e: MouseEvent) {
@@ -112,6 +97,64 @@ export function ColorBar({ id }: ColorProps) {
     setChanging(false);
     document.removeEventListener("mouseup", onMouseUp);
     document.removeEventListener("mousemove", onMouseMove);
+  }
+
+  const startTouch = useCallback((event: TouchEvent) => {
+    var touch = event.touches[0];
+    event.preventDefault();
+    setColor(id);
+    setChanging(true);
+    if (picker.current) {
+      shiftX = touch.clientX - picker.current.getBoundingClientRect().left;
+      console.log("touch");
+      document.addEventListener("touchmove", touch2);
+      document.addEventListener("touchend", exitTouch);
+    }
+  }, []);
+
+  function touch2(event: TouchEvent) {
+    var touch = event.touches[0];
+    if (slider.current && picker.current) {
+      newLeft =
+        touch.clientX - shiftX - slider.current.getBoundingClientRect().left;
+      if (newLeft < 0) {
+        newLeft = 0;
+      }
+      let rightEdge = slider.current.offsetWidth - picker.current.offsetWidth;
+      if (newLeft > rightEdge) {
+        newLeft = rightEdge;
+      }
+      picker.current.style.left = newLeft + "px";
+      if (!slider.current) {
+        return;
+      }
+      const canvas: HTMLCanvasElement = slider.current;
+      const context = canvas.getContext("2d");
+
+      if (context) {
+        var data = context.getImageData(
+          newLeft + picker.current.offsetWidth / 2,
+          0,
+          1,
+          1
+        ).data;
+
+        if (id == 0) {
+          setValue(data[0]);
+        } else if (id == 1) {
+          setValue(data[1]);
+        } else {
+          setValue(data[2]);
+        }
+      }
+    }
+  }
+
+  function exitTouch(event: TouchEvent) {
+    setChanging(false);
+
+    document.removeEventListener("touchmove", touch2);
+    document.removeEventListener("touchend", exitTouch);
   }
 
   useEffect(() => {
@@ -171,11 +214,11 @@ export function ColorBar({ id }: ColorProps) {
   }, [colorState]);
 
   return (
-    <div className="w-fit">
+    <div className="w-fit mb-4 ">
       <div className="text-sm text-gray-400 font-bold mb-1">{color[id]}</div>
       <BrowserView>
         <canvas
-          className={`rounded-full z-0 absolute ${isMobile}?w-barX_mobile: w-barX`}
+          className="rounded-full z-0 absolute w-barX h-picker"
           height="40"
           width="400"
           style={{
@@ -186,7 +229,7 @@ export function ColorBar({ id }: ColorProps) {
       </BrowserView>
       <MobileView>
         <canvas
-          className={`rounded-full z-0 absolute ${isMobile}?w-barX_mobile: w-barX`}
+          className="rounded-full z-0 absolute w-barX_mobile h-picker"
           height="40"
           width="350"
           style={{
@@ -196,7 +239,7 @@ export function ColorBar({ id }: ColorProps) {
         ></canvas>
       </MobileView>
       <div
-        className="w-picker h-picker x-10 border-2 border-white mb-4 rounded-full  z-10"
+        className="w-picker h-picker border-2 border-white rounded-full  z-10"
         style={{
           position: "relative",
           ...(isBrowser ? { left: "180px" } : { left: "155px" }),
@@ -209,6 +252,9 @@ export function ColorBar({ id }: ColorProps) {
         }}
         onMouseDown={(event: any) => {
           onMouseDown(event);
+        }}
+        onTouchStart={(event: any) => {
+          startTouch(event);
         }}
         ref={picker}
       />
