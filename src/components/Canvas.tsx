@@ -140,8 +140,8 @@ export function Canvas() {
             context.clearRect(
               newMousePosition.x - context.lineWidth,
               newMousePosition.y - context.lineWidth,
-              context.lineWidth * 5,
-              context.lineWidth * 5
+              context.lineWidth * 2,
+              context.lineWidth * 2
             );
             context.restore();
           } else {

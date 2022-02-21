@@ -12,7 +12,7 @@ import {
 function App() {
   return (
     <ColorProvider>
-      <div className="overflow-hidden">
+      <div className="overflow-hidden overscroll-none">
         <Canvas />
         {/* <SelectColor /> */}
       </div>
