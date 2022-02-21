@@ -36,46 +36,46 @@ export function SelectColor() {
         onClick={open}
       />
       <BrowserView>
-        {isOpen ? (
-          <div className="fixed left-20 bottom-10  rounded-lg w-container bg-slate-100  ">
-            <div className="flex justify-end">
-              <button
-                className=" w-8 h-8 mt-2 mr-2 rounded-full bg-gray-200 font-semibold text-gray-400 text-center text-xl"
-                onClick={close}
-              >
-                ✕
-              </button>
-            </div>
-            <div className="ml-3">
-              <ColorBar id={0} />
-              <ColorBar id={1} />
-              <ColorBar id={2} />
-            </div>
+        <div
+          className={`fixed left-20 bottom-10  rounded-lg w-container bg-slate-100 ${
+            isOpen ? "" : "hidden"
+          }`}
+        >
+          <div className="flex justify-end">
+            <button
+              className=" w-8 h-8 mt-2 mr-2 rounded-full bg-gray-200 font-semibold text-gray-400 text-center text-xl"
+              onClick={close}
+            >
+              ✕
+            </button>
           </div>
-        ) : (
-          <div></div>
-        )}
+          <div className="ml-3">
+            <ColorBar id={0} />
+            <ColorBar id={1} />
+            <ColorBar id={2} />
+          </div>
+        </div>
       </BrowserView>
       <MobileView>
-        {isOpen ? (
-          <div className="fixed left-0 bottom-0 rounded-lg w-container_mobile bg-slate-100  ">
-            <div className="flex justify-end">
-              <button
-                className=" w-8 h-8 mt-2 mr-2 rounded-full bg-gray-200 font-semibold text-gray-400 text-center text-xl"
-                onClick={close}
-              >
-                ✕
-              </button>
-            </div>
-            <div className="ml-3">
-              <ColorBar id={0} />
-              <ColorBar id={1} />
-              <ColorBar id={2} />
-            </div>
+        <div
+          className={`fixed left-0 bottom-0 rounded-lg w-container_mobile bg-slate-100  ${
+            isOpen ? "" : "hidden"
+          }`}
+        >
+          <div className="flex justify-end">
+            <button
+              className=" w-8 h-8 mt-2 mr-2 rounded-full bg-gray-200 font-semibold text-gray-400 text-center text-xl"
+              onClick={close}
+            >
+              ✕
+            </button>
           </div>
-        ) : (
-          <div></div>
-        )}
+          <div className="ml-3">
+            <ColorBar id={0} />
+            <ColorBar id={1} />
+            <ColorBar id={2} />
+          </div>
+        </div>
       </MobileView>
     </div>
   );
