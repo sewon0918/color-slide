@@ -29,7 +29,7 @@ export function SelectColor() {
   return (
     <div className="relative">
       <button
-        className="m-4 border-4  w-10 h-10 full rounded-full"
+        className=" border-4  w-10 h-10 full rounded-full"
         style={{
           background: `${current_color}`,
         }}
@@ -37,7 +37,7 @@ export function SelectColor() {
       />
       <BrowserView>
         <div
-          className={`fixed left-20 bottom-10  rounded-lg w-container bg-slate-100 ${
+          className={`fixed right-20 bottom-10  rounded-lg w-container bg-slate-100 ${
             isOpen ? "" : "hidden"
           }`}
         >

@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import { useColorState, useColorDispatch } from "../context";
-
+import { SelectColor } from "./SelectColor";
 interface CanvasProps {
   width: number;
   height: number;
@@ -54,7 +54,7 @@ export function Canvas() {
     undefined
   );
   const [isPainting, setIsPainting] = useState(false);
-
+  const [isErasing, setIsErasing] = useState(false);
   const getCoordinates = (event: MouseEvent): Coordinate | undefined => {
     if (!canvasRef.current) {
       return;
@@ -110,12 +110,44 @@ export function Canvas() {
     (event: MouseEvent) => {
       event.preventDefault();
       event.stopPropagation();
-
+      if (!canvasRef.current) {
+        return;
+      }
+      const canvas: HTMLCanvasElement = canvasRef.current;
+      const context = canvas.getContext("2d");
       if (isPainting) {
         const newMousePosition = getCoordinates(event);
-        if (mousePosition && newMousePosition) {
-          drawLine(mousePosition, newMousePosition);
-          setMousePosition(newMousePosition);
+
+        if (context && mousePosition && newMousePosition) {
+          if (isErasing) {
+            // context!!.clearRect(
+            //   newMousePosition.x - context!!.lineWidth / 2,
+            //   newMousePosition.y - context!!.lineWidth / 2,
+            //   context!!.lineWidth * 5,
+            //   context!!.lineWidth * 5
+            // );
+            context.save();
+            context.beginPath();
+            context.arc(
+              newMousePosition.x,
+              newMousePosition.y,
+              context.lineWidth * 2,
+              0,
+              2 * Math.PI,
+              true
+            );
+            context.clip();
+            context.clearRect(
+              newMousePosition.x - context.lineWidth,
+              newMousePosition.y - context.lineWidth,
+              context.lineWidth * 5,
+              context.lineWidth * 5
+            );
+            context.restore();
+          } else {
+            drawLine(mousePosition, newMousePosition);
+            setMousePosition(newMousePosition);
+          }
         }
       }
     },
@@ -131,24 +163,16 @@ export function Canvas() {
     if (!canvasRef.current) {
       return;
     }
-
     const canvas: HTMLCanvasElement = canvasRef.current;
     canvas.getContext("2d")!!.clearRect(0, 0, canvas.width, canvas.height);
   };
-
-  //   useEffect(() => {
-  //     if (!canvasRef.current) {
-  //       return;
-  //     }
-  //     const canvas: HTMLCanvasElement = canvasRef.current;
-  //     const context = canvas.getContext("2d");
-
-  //     if (context) {
-  //       console.log("fdsh");
-  //       canvas.style.width = `${window.innerWidth}px`;
-  //       canvas.style.height = `${window.innerHeight}px`;
-  //     }
-  //   }, [window.innerWidth, window.innerHeight]);
+  const erase = () => {
+    setIsErasing(true);
+    console.log(isErasing);
+  };
+  const draw = () => {
+    setIsErasing(false);
+  };
 
   useEffect(() => {
     if (!canvasRef.current) {
@@ -218,8 +242,8 @@ export function Canvas() {
   }, []);
   return (
     <div className=" ">
-      <div className="mt-3 flex justify-between">
-        <button className="w-10 h-10 rounded-full font-bold text-4xl ml-3">
+      <div className="mt-3 flex justify-between mx-3">
+        <button className="w-10 h-10 rounded-full font-bold text-4xl">
           🎨
         </button>
         <div>
@@ -236,7 +260,7 @@ export function Canvas() {
             ▶️
           </button>
           <button
-            className="w-10 h-10 rounded-full bg-gray-100 font-bold mr-3"
+            className="w-10 h-10 rounded-full bg-gray-100 font-bold "
             onClick={clearCanvas}
           >
             💥
@@ -249,6 +273,27 @@ export function Canvas() {
         width={windowSize.width}
         className="rounded-lg bg-gray-200 mt-3"
       />
+      <div className="mt-3 mx-3 flex justify-between">
+        <div>
+          <button
+            className={`w-10 h-10 rounded-full  font-bold mr-3 ${
+              isErasing ? "text-lg" : "text-4xl"
+            }`}
+            onClick={draw}
+          >
+            🖍
+          </button>
+          <button
+            className={`w-10 h-10 rounded-full  font-bold mr-3  ${
+              isErasing ? "text-4xl" : "text-lg"
+            }`}
+            onClick={erase}
+          >
+            🧽
+          </button>
+        </div>
+        <SelectColor />
+      </div>
     </div>
   );
 }

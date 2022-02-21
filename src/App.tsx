@@ -14,7 +14,7 @@ function App() {
     <ColorProvider>
       <div className="overflow-hidden">
         <Canvas />
-        <SelectColor />
+        {/* <SelectColor /> */}
       </div>
     </ColorProvider>
   );
