@@ -1,10 +1,12 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import { useColorState, useColorDispatch } from "../context";
 import { SelectColor } from "./SelectColor";
-interface CanvasProps {
-  width: number;
-  height: number;
-}
+import {
+  BrowserView,
+  MobileView,
+  isBrowser,
+  isMobile,
+} from "react-device-detect";
 
 interface Coordinate {
   x: number;
@@ -12,6 +14,9 @@ interface Coordinate {
 }
 
 export function Canvas() {
+  if (isMobile) {
+    document.body.style.overscrollBehaviorY = "none";
+  }
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -271,7 +276,7 @@ export function Canvas() {
         ref={canvasRef}
         height={windowSize.height * 0.8}
         width={windowSize.width}
-        className="rounded-lg bg-gray-200 mt-3"
+        className="rounded-lg bg-gray-200 mt-3 overscroll-y-none"
       />
       <div className="mt-3 mx-3 flex justify-between">
         <div>
