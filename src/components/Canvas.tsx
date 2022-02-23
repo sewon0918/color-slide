@@ -22,12 +22,12 @@ export function Canvas() {
     height: window.innerHeight,
   });
   const handleResize = () => {
-    if (!isMobile) {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    }
+    // if (!isMobile) {
+    setWindowSize({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
+    // }
   };
   useEffect(() => {
     window.addEventListener("resize", handleResize);
@@ -40,6 +40,9 @@ export function Canvas() {
     if (context) {
       canvas.style.width = `${windowSize.width}px`;
       canvas.style.height = `${windowSize.height * 0.8}px`;
+      if (image) {
+        context.putImageData(image, 0, 0);
+      }
     }
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -62,6 +65,8 @@ export function Canvas() {
   );
   const [isPainting, setIsPainting] = useState(false);
   const [isErasing, setIsErasing] = useState(false);
+  const [image, setImage] = useState<ImageData | null>(null);
+
   const getCoordinates = (event: MouseEvent): Coordinate | undefined => {
     if (!canvasRef.current) {
       return;
@@ -162,6 +167,22 @@ export function Canvas() {
   );
 
   const exitPaint = useCallback(() => {
+    if (!canvasRef.current) {
+      return;
+    }
+    const canvas: HTMLCanvasElement = canvasRef.current;
+    const context = canvas.getContext("2d");
+    if (context) {
+      let imageData = context.getImageData(
+        0,
+        0,
+        windowSize.width,
+        windowSize.height
+      );
+      console.log(imageData);
+      setImage(imageData);
+    }
+
     setIsPainting(false);
   }, []);
 
