@@ -22,13 +22,24 @@ export function Canvas() {
     height: window.innerHeight,
   });
   const handleResize = () => {
-    // if (!isMobile) {
     setWindowSize({
       width: window.innerWidth,
       height: window.innerHeight,
     });
-    // }
   };
+
+  useEffect(() => {
+    if (!canvasRef.current) {
+      return;
+    }
+    const canvas: HTMLCanvasElement = canvasRef.current;
+    const context = canvas.getContext("2d");
+    if (context) {
+      context.fillStyle = "#f3f4f6";
+      context.fillRect(0, 0, windowSize.width, windowSize.height);
+    }
+  }, []);
+
   useEffect(() => {
     window.addEventListener("resize", handleResize);
     if (!canvasRef.current) {
@@ -194,6 +205,18 @@ export function Canvas() {
     const canvas: HTMLCanvasElement = canvasRef.current;
     canvas.getContext("2d")!!.clearRect(0, 0, canvas.width, canvas.height);
   };
+
+  function downloadCanvas(filename: string) {
+    if (!canvasRef.current) {
+      return;
+    }
+    const canvas: HTMLCanvasElement = canvasRef.current;
+    const link: HTMLAnchorElement = document.createElement("a");
+    link.href = canvas.toDataURL();
+    link.download = filename;
+    link.click();
+  }
+
   const erase = () => {
     setIsErasing(true);
     console.log(isErasing);
@@ -290,7 +313,7 @@ export function Canvas() {
           </button>
           <button
             className="w-10 h-10 rounded-full bg-gray-100 font-bold "
-            onClick={clearCanvas}
+            onClick={() => downloadCanvas("de")}
           >
             💥
           </button>
@@ -300,7 +323,7 @@ export function Canvas() {
         ref={canvasRef}
         height={windowSize.height * 0.8}
         width={windowSize.width}
-        className="rounded-lg bg-gray-200 mt-3 overscroll-y-none"
+        className="rounded-lg bg-gray-100 mt-3 overscroll-y-none"
       />
       <div className="mt-3 mx-3 flex justify-between">
         <div>
