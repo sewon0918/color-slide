@@ -6,7 +6,7 @@ import React, { useRef, useState, useEffect, useCallback } from "react";
 function App() {
   return (
     <ColorProvider>
-      <div className="overflow-hidden overscroll-y-none">
+      <div className="overflow-hidden overscroll-y-none fixed">
         <Canvas />
       </div>
     </ColorProvider>

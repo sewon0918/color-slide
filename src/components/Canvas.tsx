@@ -93,13 +93,13 @@ export function Canvas() {
       context.closePath();
 
       context.stroke();
-      var c = context.getImageData(
-        originalMousePosition.x,
-        originalMousePosition.y,
-        1,
-        1
-      ).data;
-      console.log(c);
+      //   var c = context.getImageData(
+      //     originalMousePosition.x,
+      //     originalMousePosition.y,
+      //     1,
+      //     1
+      //   ).data;
+      //   console.log(c);
     }
   };
 
@@ -223,6 +223,7 @@ export function Canvas() {
 
   const touch = useCallback((event: TouchEvent) => {
     event.preventDefault();
+    event.stopPropagation();
     if (!canvasRef.current) {
       return;
     }
