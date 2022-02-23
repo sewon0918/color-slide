@@ -22,10 +22,12 @@ export function Canvas() {
     height: window.innerHeight,
   });
   const handleResize = () => {
-    setWindowSize({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
+    if (!isMobile) {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    }
   };
   useEffect(() => {
     window.addEventListener("resize", handleResize);
