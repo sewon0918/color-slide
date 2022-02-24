@@ -14,6 +14,7 @@ interface Coordinate {
 }
 
 export function Canvas() {
+  const filenames = ["🎨", "🖍", "🧽"];
   if (isMobile) {
     document.body.style.overscrollBehaviorY = "none";
   }
@@ -101,9 +102,15 @@ export function Canvas() {
     const context = canvas.getContext("2d");
 
     if (context) {
-      context.strokeStyle = color;
+      if (isErasing) {
+        // context.strokeStyle = "#f3f4f6";
+        context.strokeStyle = color;
+      } else {
+        context.strokeStyle = color;
+      }
+      //   context.strokeStyle = color;
       context.lineJoin = "round";
-      context.lineWidth = 5;
+      context.lineWidth = 20;
 
       context.beginPath();
       context.moveTo(originalMousePosition.x, originalMousePosition.y);
@@ -111,13 +118,6 @@ export function Canvas() {
       context.closePath();
 
       context.stroke();
-      //   var c = context.getImageData(
-      //     originalMousePosition.x,
-      //     originalMousePosition.y,
-      //     1,
-      //     1
-      //   ).data;
-      //   console.log(c);
     }
   };
 
@@ -129,6 +129,19 @@ export function Canvas() {
     }
   }, []);
 
+  function lengthBetweenTwoPoints(
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number
+  ) {
+    return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** (1 / 2);
+  }
+
+  function getAngle(x1: number, y1: number, x2: number, y2: number) {
+    var rad = Math.atan2(y2 - y1, x2 - x1);
+    return (rad * 180) / Math.PI;
+  }
   const paint = useCallback(
     (event: MouseEvent) => {
       event.preventDefault();
@@ -150,27 +163,70 @@ export function Canvas() {
             //   context!!.lineWidth * 5
             // );
             context.save();
-            context.beginPath();
-            context.arc(
-              newMousePosition.x,
-              newMousePosition.y,
-              context.lineWidth * 2,
-              0,
-              2 * Math.PI,
-              true
+            // context.beginPath();
+            // context.arc(
+            //   newMousePosition.x,
+            //   newMousePosition.y,
+            //   context.lineWidth / 2,
+            //   0,
+            //   2 * Math.PI
+            // );
+            context.rect(
+              (mousePosition.x + newMousePosition.x) / 2 -
+                lengthBetweenTwoPoints(
+                  mousePosition.x,
+                  mousePosition.y,
+                  newMousePosition.x,
+                  newMousePosition.y
+                ) /
+                  2,
+              (mousePosition.y + newMousePosition.y) / 2 -
+                context.lineWidth / 2,
+              lengthBetweenTwoPoints(
+                mousePosition.x,
+                mousePosition.y,
+                newMousePosition.x,
+                newMousePosition.y
+              ),
+              context.lineWidth
             );
+
+            context.translate(
+              (mousePosition.x + newMousePosition.x) / 2,
+              (mousePosition.y + newMousePosition.y) / 2
+            );
+            context.rotate(
+              getAngle(
+                mousePosition.x,
+                mousePosition.y,
+                newMousePosition.x,
+                newMousePosition.y
+              )
+            );
+            // context.closePath();
             context.clip();
-            context.clearRect(
-              newMousePosition.x - context.lineWidth,
-              newMousePosition.y - context.lineWidth,
-              context.lineWidth * 2,
-              context.lineWidth * 2
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.translate(
+              -(mousePosition.x + newMousePosition.x) / 2,
+              -(mousePosition.y + newMousePosition.y) / 2
             );
+            context.rotate(
+              getAngle(
+                mousePosition.x,
+                mousePosition.y,
+                newMousePosition.x,
+                newMousePosition.y
+              ) * -1
+            );
+            setMousePosition(newMousePosition);
+
             context.restore();
           } else {
             drawLine(mousePosition, newMousePosition);
             setMousePosition(newMousePosition);
           }
+          //   drawLine(mousePosition, newMousePosition);
+          //   setMousePosition(newMousePosition);
         }
       }
     },
@@ -204,6 +260,7 @@ export function Canvas() {
     }
     const canvas: HTMLCanvasElement = canvasRef.current;
     canvas.getContext("2d")!!.clearRect(0, 0, canvas.width, canvas.height);
+    setImage(null);
   };
 
   function downloadCanvas(filename: string) {
@@ -313,7 +370,9 @@ export function Canvas() {
           </button>
           <button
             className="w-10 h-10 rounded-full bg-gray-100 font-bold "
-            onClick={() => downloadCanvas("de")}
+            onClick={() =>
+              downloadCanvas(filenames[Math.floor(Math.random() * 3)])
+            }
           >
             💥
           </button>
