@@ -110,7 +110,7 @@ export function Canvas() {
       }
       //   context.strokeStyle = color;
       context.lineJoin = "round";
-      context.lineWidth = 20;
+      context.lineWidth = 5;
 
       context.beginPath();
       context.moveTo(originalMousePosition.x, originalMousePosition.y);
@@ -163,61 +163,63 @@ export function Canvas() {
             //   context!!.lineWidth * 5
             // );
             context.save();
-            // context.beginPath();
-            // context.arc(
-            //   newMousePosition.x,
-            //   newMousePosition.y,
-            //   context.lineWidth / 2,
-            //   0,
-            //   2 * Math.PI
-            // );
-            context.rect(
-              (mousePosition.x + newMousePosition.x) / 2 -
-                lengthBetweenTwoPoints(
-                  mousePosition.x,
-                  mousePosition.y,
-                  newMousePosition.x,
-                  newMousePosition.y
-                ) /
-                  2,
-              (mousePosition.y + newMousePosition.y) / 2 -
-                context.lineWidth / 2,
-              lengthBetweenTwoPoints(
-                mousePosition.x,
-                mousePosition.y,
-                newMousePosition.x,
-                newMousePosition.y
-              ),
-              context.lineWidth
+            context.beginPath();
+            context.arc(
+              newMousePosition.x,
+              newMousePosition.y,
+              10,
+              0,
+              2 * Math.PI
             );
-
-            context.translate(
-              (mousePosition.x + newMousePosition.x) / 2,
-              (mousePosition.y + newMousePosition.y) / 2
-            );
-            context.rotate(
-              getAngle(
-                mousePosition.x,
-                mousePosition.y,
-                newMousePosition.x,
-                newMousePosition.y
-              )
-            );
-            // context.closePath();
             context.clip();
             context.clearRect(0, 0, canvas.width, canvas.height);
-            context.translate(
-              -(mousePosition.x + newMousePosition.x) / 2,
-              -(mousePosition.y + newMousePosition.y) / 2
-            );
-            context.rotate(
-              getAngle(
-                mousePosition.x,
-                mousePosition.y,
-                newMousePosition.x,
-                newMousePosition.y
-              ) * -1
-            );
+            // context.translate(
+            //   (mousePosition.x + newMousePosition.x) / 2,
+            //   (mousePosition.y + newMousePosition.y) / 2
+            // );
+            // context.rotate(
+            //   getAngle(
+            //     mousePosition.x,
+            //     mousePosition.y,
+            //     newMousePosition.x,
+            //     newMousePosition.y
+            //   )
+            // );
+            // context.translate(
+            //   ((mousePosition.x + newMousePosition.x) / 2) * -1,
+            //   ((mousePosition.y + newMousePosition.y) / 2) * -1
+            // );
+            // // context.closePath();
+            // context.rect(
+            //   (mousePosition.x + newMousePosition.x) / 2 -
+            //     lengthBetweenTwoPoints(
+            //       mousePosition.x,
+            //       mousePosition.y,
+            //       newMousePosition.x,
+            //       newMousePosition.y
+            //     ) /
+            //       2,
+            //   (mousePosition.y + newMousePosition.y) / 2 -
+            //     context.lineWidth / 2,
+            //   lengthBetweenTwoPoints(
+            //     mousePosition.x,
+            //     mousePosition.y,
+            //     newMousePosition.x,
+            //     newMousePosition.y
+            //   ),
+            //   context.lineWidth
+            // );
+            // context.clip();
+            // context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // // context.rotate(
+            // //   getAngle(
+            // //     mousePosition.x,
+            // //     mousePosition.y,
+            // //     newMousePosition.x,
+            // //     newMousePosition.y
+            // //   ) * -1
+            // // );
             setMousePosition(newMousePosition);
 
             context.restore();
@@ -370,8 +372,8 @@ export function Canvas() {
           </button>
           <button
             className="w-10 h-10 rounded-full bg-gray-100 font-bold "
-            onClick={() =>
-              downloadCanvas(filenames[Math.floor(Math.random() * 3)])
+            onClick={
+              () => downloadCanvas(filenames[0]) //Math.floor(Math.random() * 3)
             }
           >
             💥
