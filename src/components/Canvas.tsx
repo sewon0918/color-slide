@@ -29,17 +29,17 @@ export function Canvas() {
     });
   };
 
-  useEffect(() => {
-    if (!canvasRef.current) {
-      return;
-    }
-    const canvas: HTMLCanvasElement = canvasRef.current;
-    const context = canvas.getContext("2d");
-    if (context) {
-      context.fillStyle = "#f3f4f6";
-      context.fillRect(0, 0, windowSize.width, windowSize.height);
-    }
-  }, []);
+  //   useEffect(() => {
+  //     if (!canvasRef.current) {
+  //       return;
+  //     }
+  //     const canvas: HTMLCanvasElement = canvasRef.current;
+  //     const context = canvas.getContext("2d");
+  //     if (context) {
+  //       context.fillStyle = "#f3f4f6";
+  //       context.fillRect(0, 0, windowSize.width, windowSize.height);
+  //     }
+  //   }, []);
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
