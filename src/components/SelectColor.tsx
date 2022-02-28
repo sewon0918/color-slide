@@ -49,7 +49,7 @@ export function SelectColor() {
               ✕
             </button>
           </div>
-          <div className="ml-3">
+          <div className="">
             <ColorBar id={0} />
             <ColorBar id={1} />
             <ColorBar id={2} />
@@ -58,7 +58,7 @@ export function SelectColor() {
       </BrowserView>
       <MobileView>
         <div
-          className={`fixed left-0 bottom-0 rounded-lg w-container_mobile bg-slate-100  ${
+          className={`fixed left-0 bottom-0 rounded-lg w-screen bg-slate-100  ${
             isOpen ? "" : "hidden"
           }`}
         >
@@ -70,7 +70,7 @@ export function SelectColor() {
               ✕
             </button>
           </div>
-          <div className="ml-3">
+          <div className="">
             <ColorBar id={0} />
             <ColorBar id={1} />
             <ColorBar id={2} />

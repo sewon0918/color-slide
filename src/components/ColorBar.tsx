@@ -214,50 +214,54 @@ export function ColorBar({ id }: ColorProps) {
   }, [colorState]);
 
   return (
-    <div className="w-fit mb-4 ">
-      <div className="text-sm text-gray-400 font-bold mb-1">{color[id]}</div>
-      <BrowserView>
-        <canvas
-          className="rounded-full z-0 absolute w-barX h-picker"
-          height="40"
-          width="400"
-          style={{
-            background: `linear-gradient(to right, ${fromColor}, ${toColor})`,
-          }}
-          ref={slider}
-        ></canvas>
-      </BrowserView>
-      <MobileView>
-        <canvas
-          className="rounded-full z-0 absolute w-barX_mobile h-picker"
-          height="40"
-          width="350"
-          style={{
-            background: `linear-gradient(to right, ${fromColor}, ${toColor})`,
-          }}
-          ref={slider}
-        ></canvas>
-      </MobileView>
-      <div
-        className="w-picker h-picker border-2 border-white rounded-full  z-10"
-        style={{
-          position: "relative",
-          ...(isBrowser ? { left: "180px" } : { left: "155px" }),
-          background: `${
-            "#" +
-            colorState.red.toString(16).padStart(2, "0") +
-            colorState.green.toString(16).padStart(2, "0") +
-            colorState.blue.toString(16).padStart(2, "0")
-          }`,
-        }}
-        onMouseDown={(event: any) => {
-          onMouseDown(event);
-        }}
-        onTouchStart={(event: any) => {
-          startTouch(event);
-        }}
-        ref={picker}
-      />
+    <div className="mb-4">
+      <div className=" w-fit mx-auto">
+        <div className="text-sm text-gray-400 font-bold mb-1">{color[id]}</div>
+        <div className={`${isMobile ? "w-barX_mobile" : "w-barX"}`}>
+          <BrowserView>
+            <canvas
+              className="rounded-full z-0 absolute w-barX h-picker"
+              height="40"
+              width="400"
+              style={{
+                background: `linear-gradient(to right, ${fromColor}, ${toColor})`,
+              }}
+              ref={slider}
+            ></canvas>
+          </BrowserView>
+          <MobileView>
+            <canvas
+              className="rounded-full z-0 absolute w-barX_mobile h-picker"
+              height="40"
+              width="350"
+              style={{
+                background: `linear-gradient(to right, ${fromColor}, ${toColor})`,
+              }}
+              ref={slider}
+            ></canvas>
+          </MobileView>
+          <div
+            className="w-picker h-picker border-2 border-white rounded-full  z-10"
+            style={{
+              position: "relative",
+              ...(isBrowser ? { left: "180px" } : { left: "155px" }),
+              background: `${
+                "#" +
+                colorState.red.toString(16).padStart(2, "0") +
+                colorState.green.toString(16).padStart(2, "0") +
+                colorState.blue.toString(16).padStart(2, "0")
+              }`,
+            }}
+            onMouseDown={(event: any) => {
+              onMouseDown(event);
+            }}
+            onTouchStart={(event: any) => {
+              startTouch(event);
+            }}
+            ref={picker}
+          />
+        </div>
+      </div>
     </div>
   );
 }
