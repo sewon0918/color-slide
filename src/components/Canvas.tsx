@@ -110,7 +110,7 @@ export function Canvas() {
       }
       //   context.strokeStyle = color;
       context.lineJoin = "round";
-      context.lineWidth = 20;
+      context.lineWidth = 5;
 
       context.beginPath();
       context.moveTo(originalMousePosition.x, originalMousePosition.y);
@@ -120,7 +120,7 @@ export function Canvas() {
       context.stroke();
     }
   };
-
+  const eraseLineWidth = 20;
   const startPaint = useCallback((event: MouseEvent) => {
     const coordinates = getCoordinates(event);
     if (coordinates) {
@@ -161,7 +161,7 @@ export function Canvas() {
             context.arc(
               newMousePosition.x,
               newMousePosition.y,
-              context.lineWidth / 2,
+              eraseLineWidth / 2,
               0,
               2 * Math.PI
             );
@@ -172,7 +172,7 @@ export function Canvas() {
                 newMousePosition.x,
                 newMousePosition.y
               ) /
-                (context.lineWidth / 4) >=
+                (eraseLineWidth / 4) >=
               1
             ) {
               const n = Math.floor(
@@ -182,7 +182,7 @@ export function Canvas() {
                   newMousePosition.x,
                   newMousePosition.y
                 ) /
-                  (context.lineWidth / 4)
+                  (eraseLineWidth / 4)
               );
               for (var i = 0; i < n + 1; i++) {
                 context.arc(
@@ -190,7 +190,7 @@ export function Canvas() {
                     (n + 1),
                   (mousePosition.y * i + newMousePosition.y * (n + 1 - i)) /
                     (n + 1),
-                  context.lineWidth / 2,
+                  eraseLineWidth / 2,
                   0,
                   2 * Math.PI
                 );
