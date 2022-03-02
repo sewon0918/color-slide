@@ -15,7 +15,7 @@ export function SelectColor() {
     colorState.red.toString(16).padStart(2, "0") +
     colorState.green.toString(16).padStart(2, "0") +
     colorState.blue.toString(16).padStart(2, "0");
-  console.log(current_color);
+  // console.log(current_color);
   const [isOpen, setIsOpen] = useState(false);
   function open() {
     console.log("open");

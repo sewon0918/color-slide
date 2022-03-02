@@ -110,7 +110,7 @@ export function Canvas() {
       }
       //   context.strokeStyle = color;
       context.lineJoin = "round";
-      context.lineWidth = 5;
+      context.lineWidth = 20;
 
       context.beginPath();
       context.moveTo(originalMousePosition.x, originalMousePosition.y);
@@ -156,70 +156,49 @@ export function Canvas() {
 
         if (context && mousePosition && newMousePosition) {
           if (isErasing) {
-            // context!!.clearRect(
-            //   newMousePosition.x - context!!.lineWidth / 2,
-            //   newMousePosition.y - context!!.lineWidth / 2,
-            //   context!!.lineWidth * 5,
-            //   context!!.lineWidth * 5
-            // );
             context.save();
             context.beginPath();
             context.arc(
               newMousePosition.x,
               newMousePosition.y,
-              10,
+              context.lineWidth / 2,
               0,
               2 * Math.PI
             );
+            if (
+              lengthBetweenTwoPoints(
+                mousePosition.x,
+                mousePosition.y,
+                newMousePosition.x,
+                newMousePosition.y
+              ) /
+                (context.lineWidth / 4) >=
+              1
+            ) {
+              const n = Math.floor(
+                lengthBetweenTwoPoints(
+                  mousePosition.x,
+                  mousePosition.y,
+                  newMousePosition.x,
+                  newMousePosition.y
+                ) /
+                  (context.lineWidth / 4)
+              );
+              for (var i = 0; i < n + 1; i++) {
+                context.arc(
+                  (mousePosition.x * i + newMousePosition.x * (n + 1 - i)) /
+                    (n + 1),
+                  (mousePosition.y * i + newMousePosition.y * (n + 1 - i)) /
+                    (n + 1),
+                  context.lineWidth / 2,
+                  0,
+                  2 * Math.PI
+                );
+              }
+            }
             context.clip();
             context.clearRect(0, 0, canvas.width, canvas.height);
-            // context.translate(
-            //   (mousePosition.x + newMousePosition.x) / 2,
-            //   (mousePosition.y + newMousePosition.y) / 2
-            // );
-            // context.rotate(
-            //   getAngle(
-            //     mousePosition.x,
-            //     mousePosition.y,
-            //     newMousePosition.x,
-            //     newMousePosition.y
-            //   )
-            // );
-            // context.translate(
-            //   ((mousePosition.x + newMousePosition.x) / 2) * -1,
-            //   ((mousePosition.y + newMousePosition.y) / 2) * -1
-            // );
-            // // context.closePath();
-            // context.rect(
-            //   (mousePosition.x + newMousePosition.x) / 2 -
-            //     lengthBetweenTwoPoints(
-            //       mousePosition.x,
-            //       mousePosition.y,
-            //       newMousePosition.x,
-            //       newMousePosition.y
-            //     ) /
-            //       2,
-            //   (mousePosition.y + newMousePosition.y) / 2 -
-            //     context.lineWidth / 2,
-            //   lengthBetweenTwoPoints(
-            //     mousePosition.x,
-            //     mousePosition.y,
-            //     newMousePosition.x,
-            //     newMousePosition.y
-            //   ),
-            //   context.lineWidth
-            // );
-            // context.clip();
-            // context.clearRect(0, 0, canvas.width, canvas.height);
 
-            // // context.rotate(
-            // //   getAngle(
-            // //     mousePosition.x,
-            // //     mousePosition.y,
-            // //     newMousePosition.x,
-            // //     newMousePosition.y
-            // //   ) * -1
-            // // );
             setMousePosition(newMousePosition);
 
             context.restore();
@@ -227,8 +206,6 @@ export function Canvas() {
             drawLine(mousePosition, newMousePosition);
             setMousePosition(newMousePosition);
           }
-          //   drawLine(mousePosition, newMousePosition);
-          //   setMousePosition(newMousePosition);
         }
       }
     },
@@ -357,6 +334,7 @@ export function Canvas() {
         <button className="w-10 h-10 rounded-full font-bold text-4xl">
           🎨
         </button>
+        <p className=" font-bold text-sm text-gray-600"> </p>
         <div>
           <button
             className="w-10 h-10 rounded-full  bg-gray-100 font-bold mr-3"
