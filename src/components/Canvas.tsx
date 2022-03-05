@@ -15,6 +15,7 @@ interface Coordinate {
 
 export function Canvas() {
   const filenames = ["🎨", "🖍", "🧽"];
+
   if (isMobile) {
     document.body.style.overscrollBehaviorY = "none";
   }
@@ -28,18 +29,6 @@ export function Canvas() {
       height: window.innerHeight,
     });
   };
-
-  //   useEffect(() => {
-  //     if (!canvasRef.current) {
-  //       return;
-  //     }
-  //     const canvas: HTMLCanvasElement = canvasRef.current;
-  //     const context = canvas.getContext("2d");
-  //     if (context) {
-  //       context.fillStyle = "#f3f4f6";
-  //       context.fillRect(0, 0, windowSize.width, windowSize.height);
-  //     }
-  //   }, []);
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
@@ -61,8 +50,6 @@ export function Canvas() {
     };
   }, [windowSize]);
 
-  //   console.log(windowSize);
-
   const colorState = useColorState();
   const color: string =
     "#" +
@@ -78,12 +65,16 @@ export function Canvas() {
   const [isPainting, setIsPainting] = useState(false);
   const [isErasing, setIsErasing] = useState(false);
   const [image, setImage] = useState<ImageData | null>(null);
+  // const [undoArray, setUndoArray] = useState<ImageData[]>([]);
+
+  let undoArray: ImageData[] = [];
+  let redoArray: ImageData[] = [];
+  const eraseLineWidth = 20;
 
   const getCoordinates = (event: MouseEvent): Coordinate | undefined => {
     if (!canvasRef.current) {
       return;
     }
-
     const canvas: HTMLCanvasElement = canvasRef.current;
     return {
       x: event.pageX - canvas.offsetLeft,
@@ -102,13 +93,7 @@ export function Canvas() {
     const context = canvas.getContext("2d");
 
     if (context) {
-      if (isErasing) {
-        // context.strokeStyle = "#f3f4f6";
-        context.strokeStyle = color;
-      } else {
-        context.strokeStyle = color;
-      }
-      //   context.strokeStyle = color;
+      context.strokeStyle = color;
       context.lineJoin = "round";
       context.lineWidth = 5;
 
@@ -120,12 +105,23 @@ export function Canvas() {
       context.stroke();
     }
   };
-  const eraseLineWidth = 20;
+
   const startPaint = useCallback((event: MouseEvent) => {
     const coordinates = getCoordinates(event);
     if (coordinates) {
       setIsPainting(true);
       setMousePosition(coordinates);
+      if (!canvasRef.current) {
+        return;
+      }
+      const canvas: HTMLCanvasElement = canvasRef.current;
+      const context = canvas.getContext("2d");
+
+      if (context && !isErasing) {
+        undoArray.push(context.getImageData(0, 0, canvas.width, canvas.height));
+
+        console.log("Start", undoArray);
+      }
     }
   }, []);
 
@@ -142,8 +138,10 @@ export function Canvas() {
     var rad = Math.atan2(y2 - y1, x2 - x1);
     return (rad * 180) / Math.PI;
   }
+
   const paint = useCallback(
     (event: MouseEvent) => {
+      // console.log("paint", isErasing);
       event.preventDefault();
       event.stopPropagation();
       if (!canvasRef.current) {
@@ -225,7 +223,7 @@ export function Canvas() {
         windowSize.width,
         windowSize.height
       );
-      console.log(imageData);
+      // console.log(imageData);
       setImage(imageData);
     }
 
@@ -242,6 +240,41 @@ export function Canvas() {
     setImage(null);
   };
 
+  const undo = useCallback(() => {
+    console.log("undo", undoArray);
+    if (!canvasRef.current) {
+      return;
+    }
+    const canvas: HTMLCanvasElement = canvasRef.current;
+    const context = canvas.getContext("2d");
+    if (context) {
+      if (undoArray.length == 0) {
+        console.log("없어");
+      } else {
+        redoArray.push(context.getImageData(0, 0, canvas.width, canvas.height));
+        context.putImageData(undoArray[undoArray.length - 1], 0, 0);
+        undoArray.pop();
+      }
+    }
+  }, []);
+
+  const redo = useCallback(() => {
+    console.log("redo", redoArray);
+    if (!canvasRef.current) {
+      return;
+    }
+    const canvas: HTMLCanvasElement = canvasRef.current;
+    const context = canvas.getContext("2d");
+    if (context) {
+      if (redoArray.length == 0) {
+        console.log("없어");
+      } else {
+        context.putImageData(redoArray[redoArray.length - 1], 0, 0);
+        redoArray.pop();
+      }
+    }
+  }, []);
+
   function downloadCanvas(filename: string) {
     if (!canvasRef.current) {
       return;
@@ -255,7 +288,6 @@ export function Canvas() {
 
   const erase = () => {
     setIsErasing(true);
-    console.log(isErasing);
   };
   const draw = () => {
     setIsErasing(false);
@@ -328,6 +360,7 @@ export function Canvas() {
     var mouseEvent = new MouseEvent("mouseup", {});
     canvas.dispatchEvent(mouseEvent);
   }, []);
+
   return (
     <div className=" ">
       <div className="mt-3 flex justify-between mx-3">
@@ -338,13 +371,13 @@ export function Canvas() {
         <div>
           <button
             className="w-10 h-10 rounded-full  bg-gray-100 font-bold mr-3"
-            onClick={clearCanvas}
+            onClick={undo}
           >
             ◀️
           </button>
           <button
             className="w-10 h-10 rounded-full bg-gray-100 font-bold mr-3"
-            onClick={clearCanvas}
+            onClick={redo}
           >
             ▶️
           </button>
