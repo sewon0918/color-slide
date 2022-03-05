@@ -119,7 +119,7 @@ export function Canvas() {
 
       if (context && !isErasing) {
         undoArray.push(context.getImageData(0, 0, canvas.width, canvas.height));
-
+        redoArray = [];
         console.log("Start", undoArray);
       }
     }
@@ -260,6 +260,7 @@ export function Canvas() {
 
   const redo = useCallback(() => {
     console.log("redo", redoArray);
+
     if (!canvasRef.current) {
       return;
     }
@@ -269,6 +270,7 @@ export function Canvas() {
       if (redoArray.length == 0) {
         console.log("없어");
       } else {
+        undoArray.push(context.getImageData(0, 0, canvas.width, canvas.height));
         context.putImageData(redoArray[redoArray.length - 1], 0, 0);
         redoArray.pop();
       }
