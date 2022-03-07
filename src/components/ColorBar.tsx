@@ -98,93 +98,93 @@ export function ColorBar({ id }: ColorProps) {
     document.removeEventListener("mouseup", onMouseUp);
     document.removeEventListener("mousemove", onMouseMove);
   }
+
   const startTouch = useCallback((event: TouchEvent) => {
-    event.preventDefault();
     var touch = event.touches[0];
-    var mouseEvent = new MouseEvent("mousedown", {
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-    });
-    slider.current!!.dispatchEvent(mouseEvent);
-    document.addEventListener("touchmove", keepTouch);
-    document.addEventListener("touchend", exitTouch);
+    // event.preventDefault();
+    setColor(id);
+    setChanging(true);
+    if (picker.current) {
+      shiftX = touch.clientX - picker.current.getBoundingClientRect().left;
+      console.log("touch");
+      document.addEventListener("touchmove", keepTouch);
+      document.addEventListener("touchend", exitTouch);
+    }
   }, []);
 
-  const keepTouch = useCallback((event: TouchEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
+  function keepTouch(event: TouchEvent) {
     var touch = event.touches[0];
-    var mouseEvent = new MouseEvent("mousemove", {
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-    });
-    slider.current!!.dispatchEvent(mouseEvent);
+    if (slider.current && picker.current) {
+      newLeft =
+        touch.clientX - shiftX - slider.current.getBoundingClientRect().left;
+      setLeft(newLeft);
+    }
+  }
+
+  function exitTouch(event: TouchEvent) {
+    setChanging(false);
+
+    document.removeEventListener("touchmove", keepTouch);
+    document.removeEventListener("touchend", exitTouch);
+  }
+
+  const barTouch = useCallback((event: TouchEvent) => {
+    var touch = event.touches[0];
+
+    if (!slider.current) {
+      return;
+    }
+    const canvas: HTMLCanvasElement = slider.current;
+    const context = canvas.getContext("2d");
+
+    if (context) {
+      console.log("Start", touch.clientX - canvas.offsetLeft);
+      newLeft =
+        touch.clientX - canvas.offsetLeft - picker.current!!.offsetWidth / 2;
+      setLeft(newLeft);
+    }
   }, []);
 
-  const exitTouch = useCallback((event: TouchEvent) => {
-    event.preventDefault();
+  function setLeft(newLeft: number) {
+    const canvas: HTMLCanvasElement = slider.current!!;
+    const context = canvas.getContext("2d");
+    if (newLeft < 0) {
+      newLeft = 0;
+    }
+    let rightEdge = slider.current!!.offsetWidth - picker.current!!.offsetWidth;
+    if (newLeft > rightEdge) {
+      newLeft = rightEdge;
+    }
+    picker.current!!.style.left = newLeft + "px";
 
-    var mouseEvent = new MouseEvent("mouseup", {});
-    slider.current!!.dispatchEvent(mouseEvent);
-  }, []);
+    var data = context!!.getImageData(
+      newLeft + picker.current!!.offsetWidth / 2,
+      0,
+      1,
+      1
+    ).data;
 
-  // const startTouch = useCallback((event: TouchEvent) => {
-  //   var touch = event.touches[0];
-  //   event.preventDefault();
-  //   setColor(id);
-  //   setChanging(true);
-  //   if (picker.current) {
-  //     shiftX = touch.clientX - picker.current.getBoundingClientRect().left;
-  //     console.log("touch");
-  //     document.addEventListener("touchmove", keepTouch);
-  //     document.addEventListener("touchend", exitTouch);
-  //   }
-  // }, []);
+    if (id == 0) {
+      setValue(data[0]);
+    } else if (id == 1) {
+      setValue(data[1]);
+    } else {
+      setValue(data[2]);
+    }
+  }
 
-  // function keepTouch(event: TouchEvent) {
-  //   var touch = event.touches[0];
-  //   if (slider.current && picker.current) {
-  //     newLeft =
-  //       touch.clientX - shiftX - slider.current.getBoundingClientRect().left;
-  //     if (newLeft < 0) {
-  //       newLeft = 0;
-  //     }
-  //     let rightEdge = slider.current.offsetWidth - picker.current.offsetWidth;
-  //     if (newLeft > rightEdge) {
-  //       newLeft = rightEdge;
-  //     }
-  //     picker.current.style.left = newLeft + "px";
-  //     if (!slider.current) {
-  //       return;
-  //     }
-  //     const canvas: HTMLCanvasElement = slider.current;
-  //     const context = canvas.getContext("2d");
+  useEffect(() => {
+    if (!slider.current) {
+      return;
+    }
+    const canvas: HTMLCanvasElement = slider.current;
 
-  //     if (context) {
-  //       var data = context.getImageData(
-  //         newLeft + picker.current.offsetWidth / 2,
-  //         0,
-  //         1,
-  //         1
-  //       ).data;
+    canvas.addEventListener("touchstart", barTouch);
 
-  //       if (id == 0) {
-  //         setValue(data[0]);
-  //       } else if (id == 1) {
-  //         setValue(data[1]);
-  //       } else {
-  //         setValue(data[2]);
-  //       }
-  //     }
-  //   }
-  // }
-
-  // function exitTouch(event: TouchEvent) {
-  //   setChanging(false);
-
-  //   document.removeEventListener("touchmove", keepTouch);
-  //   document.removeEventListener("touchend", exitTouch);
-  // }
+    return () => {
+      canvas.removeEventListener("touchstart", barTouch);
+    };
+  }, [barTouch]);
 
   useEffect(() => {
     if (id == 0) {
@@ -197,6 +197,7 @@ export function ColorBar({ id }: ColorProps) {
   }, [value]);
 
   useEffect(() => {
+    console.log(colorState);
     fixed1 = "00";
     fixed2 = "00";
     fromColor = "#";
