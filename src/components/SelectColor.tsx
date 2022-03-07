@@ -19,7 +19,6 @@ export function SelectColor() {
   const [isOpen, setIsOpen] = useState(false);
   function open() {
     console.log("open");
-    // setIsOpen((isOpen) => !isOpen);
     setIsOpen(true);
   }
   function close() {

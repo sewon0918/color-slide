@@ -62,13 +62,13 @@ export function Canvas() {
   const [mousePosition, setMousePosition] = useState<Coordinate | undefined>(
     undefined
   );
-  const [isPainting, setIsPainting] = useState(false);
+  const [isMoving, setIsMoving] = useState(false);
   const [isErasing, setIsErasing] = useState(false);
   const [image, setImage] = useState<ImageData | null>(null);
-  // const [undoArray, setUndoArray] = useState<ImageData[]>([]);
 
   let undoArray: ImageData[] = [];
   let redoArray: ImageData[] = [];
+
   const eraseLineWidth = 20;
 
   const getCoordinates = (event: MouseEvent): Coordinate | undefined => {
@@ -106,24 +106,29 @@ export function Canvas() {
     }
   };
 
-  const startPaint = useCallback((event: MouseEvent) => {
-    const coordinates = getCoordinates(event);
-    if (coordinates) {
-      setIsPainting(true);
-      setMousePosition(coordinates);
-      if (!canvasRef.current) {
-        return;
-      }
-      const canvas: HTMLCanvasElement = canvasRef.current;
-      const context = canvas.getContext("2d");
+  const startPaint = useCallback(
+    (event: MouseEvent) => {
+      const coordinates = getCoordinates(event);
+      if (coordinates) {
+        setIsMoving(true);
+        setMousePosition(coordinates);
+        if (!canvasRef.current) {
+          return;
+        }
+        const canvas: HTMLCanvasElement = canvasRef.current;
+        const context = canvas.getContext("2d");
 
-      if (context && !isErasing) {
-        undoArray.push(context.getImageData(0, 0, canvas.width, canvas.height));
-        redoArray = [];
-        console.log("Start", undoArray);
+        if (context && !isErasing) {
+          undoArray.push(
+            context.getImageData(0, 0, canvas.width, canvas.height)
+          );
+          redoArray = [];
+          console.log("Start", undoArray);
+        }
       }
-    }
-  }, []);
+    },
+    [isErasing]
+  );
 
   function lengthBetweenTwoPoints(
     x1: number,
@@ -134,14 +139,8 @@ export function Canvas() {
     return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** (1 / 2);
   }
 
-  function getAngle(x1: number, y1: number, x2: number, y2: number) {
-    var rad = Math.atan2(y2 - y1, x2 - x1);
-    return (rad * 180) / Math.PI;
-  }
-
   const paint = useCallback(
     (event: MouseEvent) => {
-      // console.log("paint", isErasing);
       event.preventDefault();
       event.stopPropagation();
       if (!canvasRef.current) {
@@ -149,7 +148,7 @@ export function Canvas() {
       }
       const canvas: HTMLCanvasElement = canvasRef.current;
       const context = canvas.getContext("2d");
-      if (isPainting) {
+      if (isMoving) {
         const newMousePosition = getCoordinates(event);
 
         if (context && mousePosition && newMousePosition) {
@@ -207,7 +206,7 @@ export function Canvas() {
         }
       }
     },
-    [isPainting, mousePosition]
+    [isMoving, mousePosition]
   );
 
   const exitPaint = useCallback(() => {
@@ -223,12 +222,75 @@ export function Canvas() {
         windowSize.width,
         windowSize.height
       );
-      // console.log(imageData);
       setImage(imageData);
     }
-
-    setIsPainting(false);
+    setIsMoving(false);
   }, []);
+
+  const startTouch = useCallback((event: TouchEvent) => {
+    event.preventDefault();
+    if (!canvasRef.current) {
+      return;
+    }
+    const canvas: HTMLCanvasElement = canvasRef.current;
+    var touch = event.touches[0];
+    var mouseEvent = new MouseEvent("mousedown", {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+    });
+    canvas.dispatchEvent(mouseEvent);
+  }, []);
+
+  const touch = useCallback((event: TouchEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!canvasRef.current) {
+      return;
+    }
+    const canvas: HTMLCanvasElement = canvasRef.current;
+    var touch = event.touches[0];
+    var mouseEvent = new MouseEvent("mousemove", {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+    });
+    canvas.dispatchEvent(mouseEvent);
+  }, []);
+
+  const exitTouch = useCallback((event: TouchEvent) => {
+    event.preventDefault();
+
+    if (!canvasRef.current) {
+      return;
+    }
+    const canvas: HTMLCanvasElement = canvasRef.current;
+    var mouseEvent = new MouseEvent("mouseup", {});
+    canvas.dispatchEvent(mouseEvent);
+  }, []);
+
+  useEffect(() => {
+    if (!canvasRef.current) {
+      return;
+    }
+    const canvas: HTMLCanvasElement = canvasRef.current;
+
+    canvas.addEventListener("mousedown", startPaint);
+    canvas.addEventListener("mousemove", paint);
+    canvas.addEventListener("mouseup", exitPaint);
+
+    canvas.addEventListener("touchstart", startTouch);
+    canvas.addEventListener("touchmove", touch);
+    canvas.addEventListener("touchend", exitTouch);
+
+    return () => {
+      canvas.removeEventListener("mousedown", startPaint);
+      canvas.removeEventListener("mousemove", paint);
+      canvas.removeEventListener("mouseup", exitPaint);
+
+      canvas.removeEventListener("touchstart", startTouch);
+      canvas.removeEventListener("touchmove", touch);
+      canvas.removeEventListener("touchend", exitTouch);
+    };
+  }, [startPaint, paint, exitPaint, startTouch, touch, exitTouch]);
 
   const clearCanvas = () => {
     console.log("delete");
@@ -294,79 +356,13 @@ export function Canvas() {
   const draw = () => {
     setIsErasing(false);
   };
-
-  useEffect(() => {
-    if (!canvasRef.current) {
-      return;
-    }
-    const canvas: HTMLCanvasElement = canvasRef.current;
-
-    canvas.addEventListener("mousedown", startPaint);
-    canvas.addEventListener("mousemove", paint);
-    canvas.addEventListener("mouseup", exitPaint);
-
-    canvas.addEventListener("touchstart", startTouch);
-    canvas.addEventListener("touchmove", touch);
-    canvas.addEventListener("touchend", exitTouch);
-    // canvas.addEventListener("mouseleave", exitPaint);
-
-    return () => {
-      canvas.removeEventListener("mousedown", startPaint);
-      canvas.removeEventListener("mousemove", paint);
-      canvas.removeEventListener("mouseup", exitPaint);
-      // canvas.removeEventListener("mouseleave", exitPaint);
-
-      canvas.removeEventListener("touchstart", startTouch);
-      canvas.removeEventListener("touchmove", touch);
-      canvas.removeEventListener("touchend", exitTouch);
-    };
-  }, [startPaint, paint, exitPaint]);
-
-  const startTouch = useCallback((event: TouchEvent) => {
-    // MouseEvent인터페이스를 TouchEvent로
-    event.preventDefault();
-    if (!canvasRef.current) {
-      return;
-    }
-    const canvas: HTMLCanvasElement = canvasRef.current;
-    var touch = event.touches[0]; // event로 부터 touch 좌표를 얻어낼수 있습니다.
-    var mouseEvent = new MouseEvent("mousedown", {
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-    });
-    canvas.dispatchEvent(mouseEvent); // 앞서 만든 마우스 이벤트를 디스패치해줍니다
-  }, []);
-
-  const touch = useCallback((event: TouchEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (!canvasRef.current) {
-      return;
-    }
-    const canvas: HTMLCanvasElement = canvasRef.current;
-    var touch = event.touches[0];
-    var mouseEvent = new MouseEvent("mousemove", {
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-    });
-    canvas.dispatchEvent(mouseEvent);
-  }, []);
-
-  const exitTouch = useCallback((event: TouchEvent) => {
-    event.preventDefault();
-
-    if (!canvasRef.current) {
-      return;
-    }
-    const canvas: HTMLCanvasElement = canvasRef.current;
-    var mouseEvent = new MouseEvent("mouseup", {});
-    canvas.dispatchEvent(mouseEvent);
-  }, []);
-
   return (
     <div className=" ">
       <div className="mt-3 flex justify-between mx-3">
-        <button className="w-10 h-10 rounded-full font-bold text-4xl">
+        <button
+          className="w-10 h-10 rounded-full font-bold text-4xl"
+          onClick={clearCanvas}
+        >
           🎨
         </button>
         <p className=" font-bold text-sm text-gray-600"> </p>
@@ -423,8 +419,3 @@ export function Canvas() {
     </div>
   );
 }
-
-// Canvas.defaultProps = {
-//   width: 800,
-//   height: 600,
-// };

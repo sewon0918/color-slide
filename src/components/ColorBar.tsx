@@ -43,7 +43,7 @@ export function ColorBar({ id }: ColorProps) {
     fromColor += fixed1 + fixed2 + "00";
     toColor += fixed1 + fixed2 + "ff";
   }
-  // console.log(fromColor, toColor);
+
   let shiftX: number = 0;
   let newLeft: number = 0;
 
@@ -98,67 +98,95 @@ export function ColorBar({ id }: ColorProps) {
     document.removeEventListener("mouseup", onMouseUp);
     document.removeEventListener("mousemove", onMouseMove);
   }
-
   const startTouch = useCallback((event: TouchEvent) => {
-    var touch = event.touches[0];
     event.preventDefault();
-    setColor(id);
-    setChanging(true);
-    if (picker.current) {
-      shiftX = touch.clientX - picker.current.getBoundingClientRect().left;
-      console.log("touch");
-      document.addEventListener("touchmove", touch2);
-      document.addEventListener("touchend", exitTouch);
-    }
+    var touch = event.touches[0];
+    var mouseEvent = new MouseEvent("mousedown", {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+    });
+    slider.current!!.dispatchEvent(mouseEvent);
+    document.addEventListener("touchmove", keepTouch);
+    document.addEventListener("touchend", exitTouch);
   }, []);
 
-  function touch2(event: TouchEvent) {
+  const keepTouch = useCallback((event: TouchEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
     var touch = event.touches[0];
-    if (slider.current && picker.current) {
-      newLeft =
-        touch.clientX - shiftX - slider.current.getBoundingClientRect().left;
-      if (newLeft < 0) {
-        newLeft = 0;
-      }
-      let rightEdge = slider.current.offsetWidth - picker.current.offsetWidth;
-      if (newLeft > rightEdge) {
-        newLeft = rightEdge;
-      }
-      picker.current.style.left = newLeft + "px";
-      if (!slider.current) {
-        return;
-      }
-      const canvas: HTMLCanvasElement = slider.current;
-      const context = canvas.getContext("2d");
+    var mouseEvent = new MouseEvent("mousemove", {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+    });
+    slider.current!!.dispatchEvent(mouseEvent);
+  }, []);
 
-      if (context) {
-        var data = context.getImageData(
-          newLeft + picker.current.offsetWidth / 2,
-          0,
-          1,
-          1
-        ).data;
+  const exitTouch = useCallback((event: TouchEvent) => {
+    event.preventDefault();
 
-        if (id == 0) {
-          setValue(data[0]);
-        } else if (id == 1) {
-          setValue(data[1]);
-        } else {
-          setValue(data[2]);
-        }
-      }
-    }
-  }
+    var mouseEvent = new MouseEvent("mouseup", {});
+    slider.current!!.dispatchEvent(mouseEvent);
+  }, []);
 
-  function exitTouch(event: TouchEvent) {
-    setChanging(false);
+  // const startTouch = useCallback((event: TouchEvent) => {
+  //   var touch = event.touches[0];
+  //   event.preventDefault();
+  //   setColor(id);
+  //   setChanging(true);
+  //   if (picker.current) {
+  //     shiftX = touch.clientX - picker.current.getBoundingClientRect().left;
+  //     console.log("touch");
+  //     document.addEventListener("touchmove", keepTouch);
+  //     document.addEventListener("touchend", exitTouch);
+  //   }
+  // }, []);
 
-    document.removeEventListener("touchmove", touch2);
-    document.removeEventListener("touchend", exitTouch);
-  }
+  // function keepTouch(event: TouchEvent) {
+  //   var touch = event.touches[0];
+  //   if (slider.current && picker.current) {
+  //     newLeft =
+  //       touch.clientX - shiftX - slider.current.getBoundingClientRect().left;
+  //     if (newLeft < 0) {
+  //       newLeft = 0;
+  //     }
+  //     let rightEdge = slider.current.offsetWidth - picker.current.offsetWidth;
+  //     if (newLeft > rightEdge) {
+  //       newLeft = rightEdge;
+  //     }
+  //     picker.current.style.left = newLeft + "px";
+  //     if (!slider.current) {
+  //       return;
+  //     }
+  //     const canvas: HTMLCanvasElement = slider.current;
+  //     const context = canvas.getContext("2d");
+
+  //     if (context) {
+  //       var data = context.getImageData(
+  //         newLeft + picker.current.offsetWidth / 2,
+  //         0,
+  //         1,
+  //         1
+  //       ).data;
+
+  //       if (id == 0) {
+  //         setValue(data[0]);
+  //       } else if (id == 1) {
+  //         setValue(data[1]);
+  //       } else {
+  //         setValue(data[2]);
+  //       }
+  //     }
+  //   }
+  // }
+
+  // function exitTouch(event: TouchEvent) {
+  //   setChanging(false);
+
+  //   document.removeEventListener("touchmove", keepTouch);
+  //   document.removeEventListener("touchend", exitTouch);
+  // }
 
   useEffect(() => {
-    // console.log("value: ", value);
     if (id == 0) {
       setRed(value);
     } else if (id == 1) {
@@ -169,7 +197,6 @@ export function ColorBar({ id }: ColorProps) {
   }, [value]);
 
   useEffect(() => {
-    // console.log("colorstate: ", colorState);
     fixed1 = "00";
     fixed2 = "00";
     fromColor = "#";
