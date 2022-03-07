@@ -47,50 +47,20 @@ export function ColorBar({ id }: ColorProps) {
   let shiftX: number = 0;
   let newLeft: number = 0;
 
-  const onMouseDown = (e: MouseEvent) => {
+  function onMouseDown(e: MouseEvent) {
     e.preventDefault();
     setColor(id);
     setChanging(true);
     if (picker.current) {
-      shiftX = e.clientX - picker.current.getBoundingClientRect().left;
+      shiftX = e.clientX - picker.current.offsetLeft;
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
     }
-  };
+  }
   function onMouseMove(e: MouseEvent) {
     if (slider.current && picker.current) {
-      newLeft =
-        e.clientX - shiftX - slider.current.getBoundingClientRect().left;
-      if (newLeft < 0) {
-        newLeft = 0;
-      }
-      let rightEdge = slider.current.offsetWidth - picker.current.offsetWidth;
-      if (newLeft > rightEdge) {
-        newLeft = rightEdge;
-      }
-      picker.current.style.left = newLeft + "px";
-      if (!slider.current) {
-        return;
-      }
-      const canvas: HTMLCanvasElement = slider.current;
-      const context = canvas.getContext("2d");
-
-      if (context) {
-        var data = context.getImageData(
-          newLeft + picker.current.offsetWidth / 2,
-          0,
-          1,
-          1
-        ).data;
-
-        if (id == 0) {
-          setValue(data[0]);
-        } else if (id == 1) {
-          setValue(data[1]);
-        } else {
-          setValue(data[2]);
-        }
-      }
+      newLeft = e.clientX - shiftX - slider.current.offsetLeft;
+      setLeft(newLeft);
     }
   }
   function onMouseUp() {
@@ -99,90 +69,82 @@ export function ColorBar({ id }: ColorProps) {
     document.removeEventListener("mousemove", onMouseMove);
   }
 
-  const startTouch = useCallback((event: TouchEvent) => {
-    var touch = event.touches[0];
-    // event.preventDefault();
+  function startTouch(e: TouchEvent) {
+    var touch = e.touches[0];
     setColor(id);
     setChanging(true);
     if (picker.current) {
-      shiftX = touch.clientX - picker.current.getBoundingClientRect().left;
+      shiftX = touch.clientX - picker.current.offsetLeft;
       console.log("touch");
       document.addEventListener("touchmove", keepTouch);
       document.addEventListener("touchend", exitTouch);
     }
-  }, []);
+  }
 
-  function keepTouch(event: TouchEvent) {
-    var touch = event.touches[0];
+  function keepTouch(e: TouchEvent) {
+    var touch = e.touches[0];
     if (slider.current && picker.current) {
-      newLeft =
-        touch.clientX - shiftX - slider.current.getBoundingClientRect().left;
+      newLeft = touch.clientX - shiftX - slider.current.offsetLeft;
       setLeft(newLeft);
     }
   }
 
-  function exitTouch(event: TouchEvent) {
+  function exitTouch() {
     setChanging(false);
 
     document.removeEventListener("touchmove", keepTouch);
     document.removeEventListener("touchend", exitTouch);
   }
 
-  const barClick = useCallback((event: MouseEvent) => {
-    if (!slider.current) {
-      return;
-    }
-    const canvas: HTMLCanvasElement = slider.current;
-    const context = canvas.getContext("2d");
-
-    if (context) {
+  const barClick = (e: MouseEvent) => {
+    if (slider.current && picker.current) {
       newLeft =
-        event.clientX - canvas.offsetLeft - picker.current!!.offsetWidth / 2;
+        e.clientX -
+        slider.current.getBoundingClientRect().left -
+        picker.current.offsetWidth / 2;
+
       setLeft(newLeft);
     }
-  }, []);
+  };
 
-  const barTouch = useCallback((event: TouchEvent) => {
-    var touch = event.touches[0];
+  const barTouch = (e: TouchEvent) => {
+    var touch = e.touches[0];
 
-    if (!slider.current) {
-      return;
-    }
-    const canvas: HTMLCanvasElement = slider.current;
-    const context = canvas.getContext("2d");
-
-    if (context) {
+    if (slider.current && picker.current) {
       newLeft =
-        touch.clientX - canvas.offsetLeft - picker.current!!.offsetWidth / 2;
+        touch.clientX -
+        slider.current.getBoundingClientRect().left -
+        picker.current.offsetWidth / 2;
       setLeft(newLeft);
     }
-  }, []);
+  };
 
   function setLeft(newLeft: number) {
-    const canvas: HTMLCanvasElement = slider.current!!;
-    const context = canvas.getContext("2d");
-    if (newLeft < 0) {
-      newLeft = 0;
-    }
-    let rightEdge = slider.current!!.offsetWidth - picker.current!!.offsetWidth;
-    if (newLeft > rightEdge) {
-      newLeft = rightEdge;
-    }
-    picker.current!!.style.left = newLeft + "px";
+    if (slider.current && picker.current) {
+      const context = slider.current.getContext("2d");
+      if (newLeft < 0) {
+        newLeft = 0;
+      }
+      let rightEdge = slider.current.offsetWidth - picker.current.offsetWidth;
+      if (newLeft > rightEdge) {
+        newLeft = rightEdge;
+      }
+      picker.current.style.left = newLeft + "px";
 
-    var data = context!!.getImageData(
-      newLeft + picker.current!!.offsetWidth / 2,
-      0,
-      1,
-      1
-    ).data;
+      var data = context!!.getImageData(
+        newLeft + picker.current.offsetWidth / 2,
+        0,
+        1,
+        1
+      ).data;
 
-    if (id == 0) {
-      setValue(data[0]);
-    } else if (id == 1) {
-      setValue(data[1]);
-    } else {
-      setValue(data[2]);
+      if (id == 0) {
+        setValue(data[0]);
+      } else if (id == 1) {
+        setValue(data[1]);
+      } else {
+        setValue(data[2]);
+      }
     }
   }
 
@@ -198,7 +160,7 @@ export function ColorBar({ id }: ColorProps) {
       canvas.removeEventListener("mousedown", barClick);
       canvas.removeEventListener("touchstart", barTouch);
     };
-  }, [barTouch]);
+  }, [barClick, barTouch]);
 
   useEffect(() => {
     if (id == 0) {
@@ -211,7 +173,6 @@ export function ColorBar({ id }: ColorProps) {
   }, [value]);
 
   useEffect(() => {
-    console.log(colorState);
     fixed1 = "00";
     fixed2 = "00";
     fromColor = "#";

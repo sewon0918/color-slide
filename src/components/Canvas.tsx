@@ -123,7 +123,7 @@ export function Canvas() {
             context.getImageData(0, 0, canvas.width, canvas.height)
           );
           redoArray = [];
-          console.log("Start", undoArray);
+          // console.log("undo", undoArray);
         }
       }
     },
@@ -311,7 +311,7 @@ export function Canvas() {
     const context = canvas.getContext("2d");
     if (context) {
       if (undoArray.length == 0) {
-        console.log("없어");
+        console.log("empty array");
       } else {
         redoArray.push(context.getImageData(0, 0, canvas.width, canvas.height));
         context.putImageData(undoArray[undoArray.length - 1], 0, 0);
@@ -330,7 +330,7 @@ export function Canvas() {
     const context = canvas.getContext("2d");
     if (context) {
       if (redoArray.length == 0) {
-        console.log("없어");
+        console.log("empty array");
       } else {
         undoArray.push(context.getImageData(0, 0, canvas.width, canvas.height));
         context.putImageData(redoArray[redoArray.length - 1], 0, 0);
