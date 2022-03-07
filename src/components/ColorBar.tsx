@@ -128,6 +128,20 @@ export function ColorBar({ id }: ColorProps) {
     document.removeEventListener("touchend", exitTouch);
   }
 
+  const barClick = useCallback((event: MouseEvent) => {
+    if (!slider.current) {
+      return;
+    }
+    const canvas: HTMLCanvasElement = slider.current;
+    const context = canvas.getContext("2d");
+
+    if (context) {
+      newLeft =
+        event.clientX - canvas.offsetLeft - picker.current!!.offsetWidth / 2;
+      setLeft(newLeft);
+    }
+  }, []);
+
   const barTouch = useCallback((event: TouchEvent) => {
     var touch = event.touches[0];
 
@@ -138,7 +152,6 @@ export function ColorBar({ id }: ColorProps) {
     const context = canvas.getContext("2d");
 
     if (context) {
-      console.log("Start", touch.clientX - canvas.offsetLeft);
       newLeft =
         touch.clientX - canvas.offsetLeft - picker.current!!.offsetWidth / 2;
       setLeft(newLeft);
@@ -178,10 +191,11 @@ export function ColorBar({ id }: ColorProps) {
       return;
     }
     const canvas: HTMLCanvasElement = slider.current;
-
+    canvas.addEventListener("mousedown", barClick);
     canvas.addEventListener("touchstart", barTouch);
 
     return () => {
+      canvas.removeEventListener("mousedown", barClick);
       canvas.removeEventListener("touchstart", barTouch);
     };
   }, [barTouch]);
